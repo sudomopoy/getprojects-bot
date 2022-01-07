@@ -1,4 +1,4 @@
-package db
+package main
 
 import (
 	"context"
@@ -7,14 +7,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const mongoHost = "mongodb://localhost:27017"
 
-func Connect() *mongo.Client {
+func Connect() *mongo.Database {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost))
 	if err != nil {
 		panic(err)
 	}
-	return client
+	return client.Database("get-projects--bot")
 }
 
 /*
