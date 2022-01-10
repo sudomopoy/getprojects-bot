@@ -3,6 +3,8 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+
+	"github.com/google/uuid"
 )
 
 func HashGen(s string) string {
@@ -11,3 +13,6 @@ func HashGen(s string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+func idGenarator() string {
+	return uuid.New().String()
+}

@@ -3,36 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go.mongodb.org/mongo-driver/bson"
-)
-
-var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
-	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonURL("1.com", "http://1.com"),
-		tgbotapi.NewInlineKeyboardButtonData("2", "test"),
-		tgbotapi.NewInlineKeyboardButtonData("3", "3"),
-	),
-	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonData("4", "4"),
-		tgbotapi.NewInlineKeyboardButtonData("5", "5"),
-		tgbotapi.NewInlineKeyboardButtonData("6", "6"),
-	),
-)
-var numericKeyboard2 = tgbotapi.NewReplyKeyboard(
-	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("1"),
-		tgbotapi.NewKeyboardButton("2"),
-		tgbotapi.NewKeyboardButton("3"),
-	),
-	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("4"),
-		tgbotapi.NewKeyboardButton("5"),
-		tgbotapi.NewKeyboardButton("6"),
-	),
 )
 
 func main() {
@@ -50,34 +24,36 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 
-	// Loop through each update.
 	for update := range updates {
 		if update.ChannelPost != nil {
 			fmt.Println(update.ChannelPost.Chat.ID)
 		}
 
-		// Check if we've gotten a message update.
 		if update.Message != nil {
 			userId := int(update.Message.Chat.ID)
-
-			// Construct a new message from the given chat ID and containing
-			// the text that we received.
-			fmt.Print("%s", update)
+			log.Printf("Chat ID: %v", userId)
 			msg := tgbotapi.NewMessage(int64(userId), "")
 			SetUserBaseInfoIfNotExists(userId)
-			if IsAdmin(int(userId)) {
+			if IsAdmin(int(userId)) { // !ADMIN
 				data := update.Message.Text
-				msg.Text = "خانه"
+				msg.Text = label_home
 				switch data {
 				case "/start":
 					msg.ReplyMarkup = ADMIN_mainPage_Keyboard
 				default:
-					msg.Text = "دستور پیدا نشد! \n لطفا یکی از گزینه های زیر را انتخاب کنید."
+					msg.Text = description_command_not_found
 					msg.ReplyMarkup = ADMIN_mainPage_Keyboard
 				}
-			} else {
+			} else { // !USER
 				cache, err := RedisClientGet(userId)
-				if !err {
+				if update.Message.Chat.UserName == "" {
+					msg.Text = description_must_have_id
+
+				} else if label_cancel_entring_project_proccess == update.Message.Text {
+					RedisClientRemove(userId)
+					msg.Text = description_project_entering_canceled
+					msg.ReplyMarkup = mainPage_Keyboard
+				} else if !err {
 					data := strings.Split(cache, ":")
 					case_key := data[0]
 					metaData := data[1]
@@ -85,63 +61,74 @@ func main() {
 					case "ENTER_PROJECT_STEP+1":
 						RedisClientSet(userId, "ENTER_PROJECT_STEP+2:"+update.Message.Text)
 						msg.ReplyMarkup = i_want_to_cancel_enter_project_Keyboard
-						msg.Text = "لطفا متن آگهی خود را وارد کنید."
+						msg.Text = label_please_enter_poster_description
 					case "ENTER_PROJECT_STEP+2":
 						res, pjId := AddNewProject(metaData, update.Message.Text, userId, update.Message.Chat.UserName)
 						msg.Text = res
-						msg.ReplyMarkup = mainPage_Keyboard
+						RedisClientRemove(userId)
+
 						admins := GetAdmins()
 						for i := 0; i < len(admins); i++ {
 							adminId := admins[i]
-							messageTextForAdmin := "کاربر" + strconv.Itoa(userId) + " پروژه ای با عنوان << " + metaData + " >> \n و متن : \n" + update.Message.Text + "\n ثبت کرده است"
+							messageTextForAdmin := func() string {
+								return fmt.Sprintf(description_new_project_from_user, userId, metaData, update.Message.Text)
+							}()
 							messageForAdmin := tgbotapi.NewMessage(int64(adminId), messageTextForAdmin)
 							var new_project_accept_or_denied = tgbotapi.NewInlineKeyboardMarkup(
 								tgbotapi.NewInlineKeyboardRow(
-									tgbotapi.NewInlineKeyboardButtonData("تایید پروژه", "accept_project:"+strconv.Itoa(pjId)),
-									tgbotapi.NewInlineKeyboardButtonData("رد پروژه", "denied_project:"+strconv.Itoa(pjId)),
+									tgbotapi.NewInlineKeyboardButtonData(label_accept, "accept_project:"+pjId),
+									tgbotapi.NewInlineKeyboardButtonData(label_reject, "denied_project:"+pjId),
 								),
 							)
 							messageForAdmin.ReplyMarkup = new_project_accept_or_denied
 							bot.Send(messageForAdmin)
+							msg.ReplyMarkup = mainPage_Keyboard
+							RedisClientRemove(userId)
 						}
 					default:
-						//TODO delete redis cache
+						RedisClientRemove(userId)
 						msg.ReplyMarkup = mainPage_Keyboard
 					}
 				} else {
-					msg.Text = "صفحه اصلی 🏠"
+					msg.Text = label_home
 					switch update.Message.Text {
+					// case label_help:
+					// 	msg.Text = description_help
+					case label_support:
+						msg.Text = description_support
+					case label_bot_designer:
+						msg.Text = description_bot_designer
 					case "/start":
+						RedisClientRemove(userId)
 						msg.ReplyMarkup = mainPage_Keyboard
 					case label_enter_project:
+						msg.Text = description_bot_usage_roles
+						msg.ReplyMarkup = i_accept_bot_usage_roles_Keyboard
+					case label_accept_bot_usage_roles:
 						RedisClientSet(userId, "ENTER_PROJECT_STEP+1:0")
 						msg.ReplyMarkup = i_want_to_cancel_enter_project_Keyboard
-						msg.Text = "لطفا عنوان آگهی خود را وارد کنید."
+						msg.Text = label_please_enter_poster_title
 					case token + password:
 						msg.Text = SetAdmin(int(userId))
+						RedisClientRemove(userId)
 						msg.ReplyMarkup = mainPage_Keyboard
 					default:
-						msg.Text = "دستور پیدا نشد! \n لطفا یکی از گزینه های زیر را انتخاب کنید."
+						msg.Text = description_command_not_found
+						RedisClientRemove(userId)
 						msg.ReplyMarkup = mainPage_Keyboard
 					}
 				}
 			}
 			msg.BaseChat.ReplyToMessageID = update.Message.MessageID
 
-			// Send the message.
 			if _, err = bot.Send(msg); err != nil {
 				panic(err)
 			}
 		} else if update.CallbackQuery != nil {
-			// Respond to the callback query, telling Telegram to show the user
-			// a message with the data received.
 			callback := tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)
 			if _, err := bot.Request(callback); err != nil {
 			}
 			userId := int(update.CallbackQuery.Message.Chat.ID)
-			fmt.Println(userId)
-
-			// And finally, send a message containing the data received.
 			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "")
 			if IsAdmin(int(userId)) {
 				data := update.CallbackQuery.Data
@@ -151,69 +138,53 @@ func main() {
 					data = tmp[0]
 					metaData = tmp[1]
 				}
-				msg.Text = "خانه"
+				msg.Text = label_home
 				switch data {
 				case "accept_project":
-					pjId, err := strconv.Atoi(metaData)
+					pjId := metaData
 					if err != nil {
 						log.Fatalf("err")
 					}
 					userId, title, description, username := UpdateSingleProject(pjId, bson.D{{"status", "accept"}})
-					msg.Text = "پروژه تایید شد✅"
+					msg.Text = label_project_accepted
 					chanelMessageText := func() string {
-						return fmt.Sprintf(`
-• %v
-%v
-
-➖➖➖➖➖➖➖
-برای ثبت آگهی به ربات @getprojectsbot مراجعه کنید.
-t.me/getprojectsofficial	
-									`, title, description)
+						return fmt.Sprintf(description_project_poster, title, description)
 					}()
 					var project_in_chanel = tgbotapi.NewInlineKeyboardMarkup(
 						tgbotapi.NewInlineKeyboardRow(
-							tgbotapi.NewInlineKeyboardButtonURL("پیام به کارفرما", "https://t.me/account/"+username),
+							tgbotapi.NewInlineKeyboardButtonURL(label_message_to_owner, "t.me/"+username),
 						),
 						tgbotapi.NewInlineKeyboardRow(
-							tgbotapi.NewInlineKeyboardButtonURL("ثبت پروژه مشابه", "https://t.me/account/getprojectsbot"),
+							tgbotapi.NewInlineKeyboardButtonURL(label_message_enter_same_project, "t.me/getprojectsbot"),
 						),
 					)
-					chanelMessage := tgbotapi.NewMessage(int64(-1001763684409), chanelMessageText)
+					chanelMessage := tgbotapi.NewMessage(masterChannelId, chanelMessageText)
 					chanelMessage.ReplyMarkup = project_in_chanel
-					userMessageText := "پروژه ی: " + title + "\n تایید شد و در کانال قرار گرفت.✅"
+					userMessageText := func() string {
+						return fmt.Sprintf(description_project_accepted, title)
+					}()
 					bot.Send(chanelMessage)
 					bot.Send(tgbotapi.NewMessage(int64(userId), userMessageText))
 				case "denied_project":
-					pjId, err := strconv.Atoi(metaData)
+					pjId := metaData
 					if err != nil {
 						log.Fatalf("err")
 					}
 					userId, title, _, _ := UpdateSingleProject(pjId, bson.D{{"status", "reject"}})
-					msg.Text = "پروژه رد شد🚫"
-					userMessageText := "پروژه ی: " + title + "\n رد شد .🚫"
+					msg.Text = label_project_rejected
+					userMessageText := func() string {
+						return fmt.Sprintf(description_project_rejected, title)
+					}()
 					bot.Send(tgbotapi.NewMessage(int64(userId), userMessageText))
 				default:
-					msg.Text = "دستور پیدا نشد! \n لطفا یکی از گزینه های زیر را انتخاب کنید."
+					msg.Text = description_command_not_found
 					msg.ReplyMarkup = ADMIN_mainPage_Keyboard
+					RedisClientRemove(userId)
 				}
 			}
 			if _, err := bot.Send(msg); err != nil {
 				panic(err)
 			}
 		}
-		// else if update.CallbackQuery != nil {
-		// 	// Respond to the callback query, telling Telegram to show the user
-		// 	// a message with the data received.
-		// 	callback := tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)
-		// 	if _, err := bot.Request(callback); err != nil {
-		// 		panic(err)
-		// 	}
-
-		// 	// And finally, send a message containing the data received.
-		// 	msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
-		// 	if _, err := bot.Send(msg); err != nil {
-		// 		panic(err)
-		// 	}
-		// }
 	}
 }

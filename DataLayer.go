@@ -4,43 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
-	"strconv"
 
-	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 var ctx = context.Background()
 
-func RedisClientSet(id int, step string) bool {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       1,  // use default DB
-	})
-
-	err := rdb.Set(ctx, strconv.Itoa(id), step, 0).Err()
-	if err != nil {
-		return false
-	}
-	return true
-}
-func RedisClientGet(id int) (string, bool) {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       1,  // use default DB
-	})
-	val, err := rdb.Get(ctx, strconv.Itoa(id)).Result()
-	if err == redis.Nil {
-		return "", true
-	} else if err != nil {
-		return "", true
-	} else {
-		return val, false
-	}
-}
 func DBSetAdmin(id int) bool {
 	ClCTX := Connect().Collection(collection_user)
 	user := bson.D{{"role", "admin"}, {"admin-token", HashGen(token)}} // {"fullName", "User 1"}, {"age", 30}
@@ -80,9 +49,9 @@ func CollectionIsEmpty(clName string) bool {
 	Count, _ := ClCTX.CountDocuments(context.TODO(), bson.D{})
 	return int(Count) == 0
 }
-func AddNewProjectBaseInfo(title string, description string, userId int, username string) (bool, int) {
+func AddNewProjectBaseInfo(title string, description string, userId int, username string) (bool, string) {
 	ClCTX := Connect().Collection(collection_projects)
-	pjId := rand.Intn(1000000000000000)
+	pjId := idGenarator()
 	project := bson.D{{"_id", pjId}, {"userId", userId}, {"title", title}, {"description", description}, {"status", "pending"}, {"username", username}} // {"fullName", "User 1"}, {"age", 30}
 	ClCTX.InsertOne(context.TODO(), project)
 	return true, pjId
@@ -104,7 +73,7 @@ func GetAdminsIds() []int {
 	return res
 }
 
-func DBUpdateSingleProject(pjId int, NewArgs bson.D) bson.M {
+func DBUpdateSingleProject(pjId string, NewArgs bson.D) bson.M {
 	ClCTX := Connect().Collection(collection_projects)
 	fmt.Println(pjId)
 	ClCTX.UpdateOne(context.TODO(), bson.D{{"_id", pjId}}, bson.D{{"$set", NewArgs}})

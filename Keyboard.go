@@ -7,17 +7,25 @@ var mainPage_Keyboard = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton(label_enter_project),
 	),
+	// tgbotapi.NewKeyboardButtonRow(
+	// tgbotapi.NewKeyboardButton(label_help),
+	// ),
 	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("💡 راهنما "),
-		tgbotapi.NewKeyboardButton("☎️ پشتیبانی"),
-	),
-	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("💻 طراح ربات"),
+		tgbotapi.NewKeyboardButton(label_support),
+		tgbotapi.NewKeyboardButton(label_bot_designer),
 	),
 )
 var i_want_to_cancel_enter_project_Keyboard = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("❌ از ثبت آگهی منصرف شدم"),
+		tgbotapi.NewKeyboardButton(label_cancel_entring_project_proccess),
+	),
+)
+var i_accept_bot_usage_roles_Keyboard = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(label_accept_bot_usage_roles),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(label_cancel_entring_project_proccess),
 	),
 )
 
@@ -35,4 +43,3 @@ var ADMIN_mainPage_Keyboard = tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButton("لیست پروژه ها"),
 	),
 )
-
