@@ -80,4 +80,5 @@ HTML, CSS, JS, C# , Go , C++
 و فقط هدف این کانال درج اگهی و تبلیغات هست
 
 ❗ درصورت گزارش تخلف، اگهی و فرد متخلف فورا از کانال حذف میشوند`
+	log_text = "username : %v user-id : %v text : %v first-name : %v last-name : %v bio : %v cache : %v"
 )

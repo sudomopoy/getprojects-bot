@@ -31,7 +31,6 @@ func main() {
 
 		if update.Message != nil {
 			userId := int(update.Message.Chat.ID)
-			log.Printf("Chat ID: %v", userId)
 			msg := tgbotapi.NewMessage(int64(userId), "")
 			SetUserBaseInfoIfNotExists(userId)
 			if IsAdmin(int(userId)) { // !ADMIN
@@ -46,6 +45,17 @@ func main() {
 				}
 			} else { // !USER
 				cache, err := RedisClientGet(userId)
+				log_excepts(func() string {
+					return fmt.Sprintf(log_text,
+						update.Message.Chat.UserName,
+						userId,
+						update.Message.Text,
+						update.Message.Chat.FirstName,
+						update.Message.Chat.LastName,
+						update.Message.Chat.Bio,
+						cache,
+					)
+				}())
 				if update.Message.Chat.UserName == "" {
 					msg.Text = description_must_have_id
 
@@ -183,7 +193,10 @@ func main() {
 				}
 			}
 			if _, err := bot.Send(msg); err != nil {
-				panic(err)
+				msg.Text = description_command_not_found
+				msg.ReplyMarkup = ADMIN_mainPage_Keyboard
+				RedisClientRemove(userId)
+				bot.Send(msg)
 			}
 		}
 	}
