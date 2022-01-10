@@ -8,7 +8,7 @@ import (
 
 func RedisClientSet(id int, step string) bool {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     redisHost,
 		Password: "", // no password set
 		DB:       1,  // use default DB
 	})
@@ -21,7 +21,7 @@ func RedisClientSet(id int, step string) bool {
 }
 func RedisClientGet(id int) (string, bool) {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     redisHost,
 		Password: "", // no password set
 		DB:       1,  // use default DB
 	})
@@ -36,7 +36,7 @@ func RedisClientGet(id int) (string, bool) {
 }
 func RedisClientRemove(id int) {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     redisHost,
 		Password: "", // no password set
 		DB:       1,  // use default DB
 	})
