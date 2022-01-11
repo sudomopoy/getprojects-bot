@@ -70,6 +70,7 @@ func GetAdminsIds() []int {
 	var res []int
 	for i := 0; i < len(admins); i++ {
 		fmt.Println(admins[i]["_id"])
+		fmt.Println(reflect.TypeOf(admins[i]["_id"]))
 		if reflect.TypeOf(admins[i]["_id"]).Kind() == reflect.String {
 			res = append(res, int(admins[i]["_id"].(int32)))
 		} else {
