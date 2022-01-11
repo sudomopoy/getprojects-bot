@@ -68,6 +68,7 @@ func GetAdminsIds() []int {
 	}
 	var res []int
 	for i := 0; i < len(admins); i++ {
+		fmt.Println(admins[i]["_id"])
 		res = append(res, int(admins[i]["_id"].(int32)))
 	}
 	return res
