@@ -6,7 +6,7 @@ var mongoHost = func() string {
 	if GetProccessMode() == "development" {
 		return "mongodb://localhost:27017"
 	} else {
-		return getEnv("mongo-db")
+		return getEnv("MONGODB_HOST")
 	}
 }()
 
@@ -14,22 +14,23 @@ var redisHost = func() string {
 	if GetProccessMode() == "development" {
 		return "localhost:6379"
 	} else {
-		return getEnv("cache-redis")
+		return getEnv("RDIS_CACHE_HOST")
 	}
 }()
 var redisPassword = func() string {
 	if GetProccessMode() == "development" {
 		return ""
 	} else {
-		return getEnv("cache-redis-password")
+		return getEnv("REDIS_CACHE_PASSWORD")
 	}
 }()
 const redisDB = 0
+
 var token string = func() string {
 	if GetProccessMode() == "development" {
 		return "5088880596:AAHsxcFzwBlIGl06Ckyy-dOyoVgfrk03vQU"
 	} else {
-		return getEnv("bot-token")
+		return getEnv("BOT_TOKEN")
 	}
 }()
 
@@ -37,7 +38,7 @@ var password string = func() string {
 	if GetProccessMode() == "development" {
 		return "LH6vkeV5yaW5pj2yewXYqZUenCaNhFSaKad3tRJ5abVSSpS39sXyRsb"
 	} else {
-		return getEnv("bot-admin-password")
+		return getEnv("ADMIN_PASSWORD")
 	}
 }()
 
@@ -52,7 +53,7 @@ var masterChannelId int64 = func() int64 {
 var lang string = "fa"
 
 func GetProccessMode() string {
-	return getEnv("ge-projects-bot-mode")
+	return getEnv("BOT_MODE")
 }
 
 func getEnv(env string) string {
