@@ -5,14 +5,14 @@ import (
 	"strconv"
 )
 
-var mongoHost = func() string {
+var mongoDatabase = func() string {
 	if GetProccessMode() == "development" {
 		return "get-projects--bot"
 	} else {
 		return getEnv("MONGODB_DATABASE_NAME")
 	}
 }()
-var mongoDatabase = func() string {
+var mongoHost = func() string {
 	if GetProccessMode() == "development" {
 		return "mongodb://localhost:27017"
 	} else {
