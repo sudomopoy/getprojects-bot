@@ -1,6 +1,9 @@
 package main
 
-import "os"
+import (
+	"os"
+	"strconv"
+)
 
 var mongoHost = func() string {
 	if GetProccessMode() == "development" {
@@ -47,7 +50,8 @@ var masterChannelId int64 = func() int64 {
 	if GetProccessMode() == "development" {
 		return -1001396154237
 	} else {
-		return -1001763684409
+		chId, _ := strconv.Atoi(getEnv("CONNECTED_CHANNEL"))
+		return int64(chId)
 	}
 }()
 
