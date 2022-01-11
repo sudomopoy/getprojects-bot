@@ -13,10 +13,10 @@ func main() {
 	fmt.Print(token)
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err, "bot")
 	}
 
-	bot.Debug = true
+	bot.Debug = GetProccessMode() == "development"
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
@@ -28,9 +28,7 @@ func main() {
 	for update := range updates {
 		if update.ChannelPost != nil {
 			fmt.Println(update.ChannelPost.Chat.ID)
-		}
-
-		if update.Message != nil {
+		} else if update.Message != nil {
 			userId := int(update.Message.Chat.ID)
 			msg := tgbotapi.NewMessage(int64(userId), "")
 			SetUserBaseInfoIfNotExists(userId)
