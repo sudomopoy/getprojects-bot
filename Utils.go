@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"log"
 	"os"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -27,12 +26,8 @@ func log_excepts(_log string) {
 			return "/data/logs/user-logs.log"
 		}
 	}()
-	mode := os.ModePerm
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.Mkdir(path, mode)
-	}
-	data := []byte(time.Now().String() + " : " + _log)
-	err := os.WriteFile(path, data, 0644)
+	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	defer f.Close()
 	check(err)
 }
 
