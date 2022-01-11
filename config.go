@@ -14,7 +14,7 @@ var redisHost = func() string {
 	if GetProccessMode() == "development" {
 		return "localhost:6379"
 	} else {
-		return getEnv("RDIS_CACHE_HOST")
+		return getEnv("REDIS_CACHE_HOST")
 	}
 }()
 var redisPassword = func() string {
@@ -24,6 +24,7 @@ var redisPassword = func() string {
 		return getEnv("REDIS_CACHE_PASSWORD")
 	}
 }()
+
 const redisDB = 0
 
 var token string = func() string {

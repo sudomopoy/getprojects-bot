@@ -23,7 +23,6 @@ func main() {
 	u.Timeout = 180
 
 	updates := bot.GetUpdatesChan(u)
-
 	for update := range updates {
 		if update.ChannelPost != nil {
 			fmt.Println(update.ChannelPost.Chat.ID)
