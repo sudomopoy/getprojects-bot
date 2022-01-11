@@ -7,6 +7,13 @@ import (
 
 var mongoHost = func() string {
 	if GetProccessMode() == "development" {
+		return "get-projects--bot"
+	} else {
+		return getEnv("MONGODB_DATABASE_NAME")
+	}
+}()
+var mongoDatabase = func() string {
+	if GetProccessMode() == "development" {
 		return "mongodb://localhost:27017"
 	} else {
 		return getEnv("MONGODB_HOST")
@@ -28,7 +35,14 @@ var redisPassword = func() string {
 	}
 }()
 
-const redisDB = 0
+var redisDB = func() int {
+	if GetProccessMode() == "development" {
+		return 0
+	} else {
+		chId, _ := strconv.Atoi(getEnv("REDIS_CACHE_DATABASE"))
+		return chId
+	}
+}()
 
 var token string = func() string {
 	if GetProccessMode() == "development" {

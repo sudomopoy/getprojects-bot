@@ -13,7 +13,7 @@ func Connect() *mongo.Database {
 	if err != nil {
 		panic(err)
 	}
-	return client.Database("get-projects--bot")
+	return client.Database(mongoDatabase)
 }
 
 /*
