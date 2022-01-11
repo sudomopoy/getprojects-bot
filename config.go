@@ -17,7 +17,14 @@ var redisHost = func() string {
 		return getEnv("cahe-redis")
 	}
 }()
-
+var redisPassword = func() string {
+	if GetProccessMode() == "development" {
+		return ""
+	} else {
+		return getEnv("cache-redis-password")
+	}
+}()
+const redisDB = 0
 var token string = func() string {
 	if GetProccessMode() == "development" {
 		return "5088880596:AAHsxcFzwBlIGl06Ckyy-dOyoVgfrk03vQU"

@@ -6,13 +6,16 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-func RedisClientSet(id int, step string) bool {
+func RedisCacheConnect() *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     redisHost,
-		Password: "", // no password set
-		DB:       1,  // use default DB
+		Password: redisPassword, // no password set
+		DB:       redisDB,       // use default DB
 	})
-
+	return rdb
+}
+func RedisClientSet(id int, step string) bool {
+	rdb := RedisCacheConnect()
 	err := rdb.Set(ctx, strconv.Itoa(id), step, 0).Err()
 	if err != nil {
 		return false
@@ -20,11 +23,7 @@ func RedisClientSet(id int, step string) bool {
 	return true
 }
 func RedisClientGet(id int) (string, bool) {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     redisHost,
-		Password: "", // no password set
-		DB:       1,  // use default DB
-	})
+	rdb := RedisCacheConnect()
 	val, err := rdb.Get(ctx, strconv.Itoa(id)).Result()
 	if err == redis.Nil {
 		return "", true
@@ -35,10 +34,6 @@ func RedisClientGet(id int) (string, bool) {
 	}
 }
 func RedisClientRemove(id int) {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     redisHost,
-		Password: "", // no password set
-		DB:       1,  // use default DB
-	})
+	rdb := RedisCacheConnect()
 	rdb.Del(ctx, strconv.Itoa(id)).Result()
 }
