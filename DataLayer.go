@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"reflect"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -69,7 +70,11 @@ func GetAdminsIds() []int {
 	var res []int
 	for i := 0; i < len(admins); i++ {
 		fmt.Println(admins[i]["_id"])
-		res = append(res, int(admins[i]["_id"].(int32)))
+		if reflect.TypeOf(admins[i]["_id"]).Kind() == reflect.String {
+			res = append(res, int(admins[i]["_id"].(int32)))
+		} else {
+			res = append(res, int(admins[i]["_id"].(int64)))
+		}
 	}
 	return res
 }
