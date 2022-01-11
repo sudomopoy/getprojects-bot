@@ -5,13 +5,7 @@ import (
 	"strconv"
 )
 
-var mongoDatabase = func() string {
-	if GetProccessMode() == "development" {
-		return "get-projects--bot"
-	} else {
-		return getEnv("MONGODB_DATABASE_NAME")
-	}
-}()
+
 var mongoHost = func() string {
 	if GetProccessMode() == "development" {
 		return "mongodb://localhost:27017"
@@ -66,6 +60,15 @@ var masterChannelId int64 = func() int64 {
 	} else {
 		chId, _ := strconv.Atoi(getEnv("CONNECTED_CHANNEL"))
 		return int64(chId)
+	}
+}()
+
+
+var mongoDatabase = func() string {
+	if GetProccessMode() == "development" {
+		return "get-projects--bot"
+	} else {
+		return getEnv("MONGODB_DATABASE_NAME")
 	}
 }()
 
