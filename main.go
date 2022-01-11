@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	fmt.Print(token)
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Fatal(err, " bot: ", token)
