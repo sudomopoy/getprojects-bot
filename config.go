@@ -14,7 +14,7 @@ var redisHost = func() string {
 	if GetProccessMode() == "development" {
 		return "localhost:6379"
 	} else {
-		return getEnv("cahe-redis")
+		return getEnv("cache-redis")
 	}
 }()
 var redisPassword = func() string {
