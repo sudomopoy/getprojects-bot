@@ -5,12 +5,25 @@ import (
 	"strconv"
 )
 
-
 var mongoHost = func() string {
 	if GetProccessMode() == "development" {
 		return "mongodb://localhost:27017"
 	} else {
 		return getEnv("MONGODB_HOST")
+	}
+}()
+var mongoUsername = func() string {
+	if GetProccessMode() == "development" {
+		return "root"
+	} else {
+		return getEnv("MONGODB_USERNAME")
+	}
+}()
+var mongoPassword = func() string {
+	if GetProccessMode() == "development" {
+		return ""
+	} else {
+		return getEnv("MONGODB_PASSWORD")
 	}
 }()
 
@@ -62,7 +75,6 @@ var masterChannelId int64 = func() int64 {
 		return int64(chId)
 	}
 }()
-
 
 var mongoDatabase = func() string {
 	if GetProccessMode() == "development" {
