@@ -21,7 +21,7 @@ var mongoUsername = func() string {
 }()
 var mongoPassword = func() string {
 	if GetProccessMode() == "development" {
-		return ""
+		return "---"
 	} else {
 		return getEnv("MONGODB_PASSWORD")
 	}

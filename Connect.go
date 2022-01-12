@@ -8,10 +8,18 @@ import (
 )
 
 func Connect() *mongo.Database {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost))
-	if err != nil {
-		panic(err)
+	var client *mongo.Client
+	var err error
+	if GetProccessMode() == "production" {
+		credential := options.Credential{
+			Username: mongoUsername,
+			Password: mongoPassword,
+		}
+		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost).SetAuth(credential))
+	} else {
+		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost))
 	}
+	check(err)
 	return client.Database(mongoDatabase)
 }
 
