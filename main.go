@@ -70,6 +70,33 @@ func main() {
 				if update.Message.Chat.UserName == "" {
 					msg.Text = description_must_have_id
 
+				} else if cache == "GETTING_PHONE_NUMBER:0" {
+					var phoneNumber string = "---"
+					if update.Message != nil {
+						if update.Message.Contact != nil {
+							phoneNumber = update.Message.Contact.PhoneNumber
+							if userId == int(update.Message.Contact.UserID) && phoneNumber != "---" {
+								if IranianPhoneValidate(phoneNumber) {
+									if setPhoneNumber(userId, phoneNumber) {
+										msg.Text = "شماره تلفن تایید شد."
+										RedisClientRemove(userId)
+										msg.ReplyMarkup = ADMIN_mainPage_Keyboard
+									} else {
+										msg.Text = "مشکلی پیش آمده."
+									}
+								} else {
+									msg.Text = "شماره تلفن میبایست ایرانی باشد"
+								}
+							}
+						}
+					}
+					if msg.Text == "" {
+						msg.Text = "لطفا شماره تلفن خود را به اشتراک بگذارید."
+					}
+				} else if isPhoneNumberVerified(userId) {
+					msg.ReplyMarkup = send_phone_number_Keyboard
+					msg.Text = description_should_have_phone_number
+					RedisClientSet(userId, "GETTING_PHONE_NUMBER:0")
 				} else if label_cancel_entring_project_proccess == update.Message.Text {
 					RedisClientRemove(userId)
 					msg.Text = description_project_entering_canceled

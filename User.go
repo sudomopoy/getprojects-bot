@@ -39,3 +39,10 @@ func GetUsersInfo() {
 	}
 	return
 }
+func isPhoneNumberVerified(id int) bool {
+	user := GetFilterUser(bson.D{{"_id", id}})
+	return user[0]["phone"] == "NotSet"
+}
+func setPhoneNumber(id int, phone string) bool {
+	return updateSingleUser(id, bson.D{{"phone", phone}})
+}

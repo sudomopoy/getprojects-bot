@@ -17,6 +17,15 @@ func DBSetAdmin(id int) bool {
 	ClCTX.UpdateOne(context.TODO(), bson.D{{"_id", id}}, bson.D{{"$set", user}})
 	return true
 }
+func updateSingleUser(id int, to bson.D) bool {
+	ClCTX := Connect().Collection(collection_user)
+	_, err := ClCTX.UpdateOne(context.TODO(), bson.D{{"_id", id}}, bson.D{{"$set", to}})
+	check(err)
+	if err != nil {
+		return false
+	}
+	return true
+}
 
 func IsAdmin(id int) bool {
 	result := false

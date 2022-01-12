@@ -53,7 +53,7 @@ var redisDB = func() int {
 
 var token string = func() string {
 	if GetProccessMode() == "development" {
-		return "5088880596:AAHsxcFzwBlIGl06Ckyy-dOyoVgfrk03vQU"
+		return "5029896112:AAHxUTEWiTXR6k64hoN1HeBxI1J3cb1530A"
 	} else {
 		return getEnv("BOT_TOKEN")
 	}

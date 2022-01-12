@@ -29,6 +29,12 @@ var i_accept_bot_usage_roles_Keyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
+var send_phone_number_Keyboard = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButtonContact("📱 شماره موبایلم را ارسال کن"),
+	),
+)
+
 // Admin Keyboards
 
 var ADMIN_mainPage_Keyboard = tgbotapi.NewReplyKeyboard(
