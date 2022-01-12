@@ -210,26 +210,33 @@ func main() {
 				case "accept_project":
 					pjId := metaData
 					check(err)
-					userId, title, description, username := UpdateSingleProject(pjId, bson.D{{"status", "accept"}})
-					msg.Text = label_project_accepted
-					chanelMessageText := func() string {
-						return fmt.Sprintf(description_project_poster, title, description)
-					}()
-					var project_in_chanel = tgbotapi.NewInlineKeyboardMarkup(
-						tgbotapi.NewInlineKeyboardRow(
-							tgbotapi.NewInlineKeyboardButtonURL(label_message_to_owner, "t.me/"+username),
-						),
-						tgbotapi.NewInlineKeyboardRow(
-							tgbotapi.NewInlineKeyboardButtonURL(label_message_enter_same_project, "t.me/getprojectsbot"),
-						),
-					)
-					chanelMessage := tgbotapi.NewMessage(masterChannelId, chanelMessageText)
-					chanelMessage.ReplyMarkup = project_in_chanel
-					userMessageText := func() string {
-						return fmt.Sprintf(description_project_accepted, title)
-					}()
-					bot.Send(chanelMessage)
-					bot.Send(tgbotapi.NewMessage(int64(userId), userMessageText))
+					pjStatus, pjTitle := GetSingleProjectStatus(pjId)
+					if pjStatus == "pending" {
+						userId, title, description, username := UpdateSingleProject(pjId, bson.D{{"status", "accept"}})
+						msg.Text = label_project_accepted
+						chanelMessageText := func() string {
+							return fmt.Sprintf(description_project_poster, title, description)
+						}()
+						var project_in_chanel = tgbotapi.NewInlineKeyboardMarkup(
+							tgbotapi.NewInlineKeyboardRow(
+								tgbotapi.NewInlineKeyboardButtonURL(label_message_to_owner, "t.me/"+username),
+							),
+							tgbotapi.NewInlineKeyboardRow(
+								tgbotapi.NewInlineKeyboardButtonURL(label_message_enter_same_project, "t.me/getprojectsbot"),
+							),
+						)
+						chanelMessage := tgbotapi.NewMessage(masterChannelId, chanelMessageText)
+						chanelMessage.ReplyMarkup = project_in_chanel
+						userMessageText := func() string {
+							return fmt.Sprintf(description_project_accepted, title)
+						}()
+						bot.Send(chanelMessage)
+						bot.Send(tgbotapi.NewMessage(int64(userId), userMessageText))
+					} else {
+						msg.Text = func() string {
+							return fmt.Sprintf(label_project_status_connot_edit, pjTitle)
+						}()
+					}
 				case "denied_project":
 					pjId := metaData
 					check(err)

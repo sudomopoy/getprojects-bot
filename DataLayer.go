@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"reflect"
 
@@ -101,11 +100,17 @@ func GetFilterUser(filter bson.D) []bson.M {
 
 func DBUpdateSingleProject(pjId string, NewArgs bson.D) bson.M {
 	ClCTX := Connect().Collection(collection_projects)
-	fmt.Println(pjId)
 	ClCTX.UpdateOne(context.TODO(), bson.D{{"_id", pjId}}, bson.D{{"$set", NewArgs}})
 	var prjRes bson.M
-	if err := ClCTX.FindOne(context.TODO(), bson.D{{"_id", pjId}}).Decode(&prjRes); err != nil {
-		log.Fatal(err)
-	}
+	err := ClCTX.FindOne(context.TODO(), bson.D{{"_id", pjId}}).Decode(&prjRes)
+	check(err)
+	return prjRes
+}
+
+func GetSingleProject(_id string) bson.M {
+	ClCTX := Connect().Collection(collection_projects)
+	var prjRes bson.M
+	err := ClCTX.FindOne(context.TODO(), bson.D{{"_id", _id}}).Decode(&prjRes)
+	check(err)
 	return prjRes
 }

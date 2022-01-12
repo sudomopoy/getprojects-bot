@@ -10,6 +10,7 @@ var (
 	label_project_entered                 = "✅ پروژه ثبت گردید. پس از تایید انتشار میابد."
 	label_project_rejected                = "پروژه رد شد🚫"
 	label_message_to_owner                = "پیام به کارفرما"
+	label_project_status_connot_edit      = "وضعیت پروژه %v قبلا مشخص شده و قابل تغییر نیست."
 	label_message_enter_same_project      = "ثبت پروژه مشابه"
 	label_please_enter_poster_title       = `
 	👇 موضوع آگهی خود را ارسال کنید
