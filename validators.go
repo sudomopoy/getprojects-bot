@@ -5,6 +5,6 @@ import (
 )
 
 func IranianPhoneValidate(phone string) bool {
-	match, _ := regexp.MatchString(`^\+98[0-9]{10}$`, phone)
+	match, _ := regexp.MatchString(`^\+*98[0-9]{10}$`, phone)
 	return match
 }
