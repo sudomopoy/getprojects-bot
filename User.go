@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"reflect"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -25,8 +25,13 @@ func AddNewProject(title string, description string, userId int, username string
 }
 func UpdateSingleProject(pjId string, NewArgs bson.D) (int, string, string, string) {
 	var result bson.M = DBUpdateSingleProject(pjId, NewArgs)
-	fmt.Println(result)
-	return int(result["userId"].(int64)), result["title"].(string), result["description"].(string), result["username"].(string)
+	var userId int
+	if reflect.TypeOf(result["userId"]).Kind() == reflect.Int32 {
+		userId = int(result["userId"].(int32))
+	} else {
+		userId = int(result["userId"].(int64))
+	}
+	return userId, result["title"].(string), result["description"].(string), result["username"].(string)
 }
 func GetAdmins() []int {
 	return GetAdminsIds()
