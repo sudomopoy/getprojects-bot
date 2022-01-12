@@ -50,6 +50,18 @@ func main() {
 				switch data {
 				case "/start":
 					msg.ReplyMarkup = ADMIN_mainPage_Keyboard
+				case label_users_list:
+					users := GetAllUsersInfo("user")
+					var finalUsers string = ""
+					for i := 0; i < len(users); i++ {
+						if users[i]["phone"] != "NotSet" {
+							finalUsers += func() string {
+								return fmt.Sprintf("کاربر : %v , شماره تلفن : %v \n", users[i]["_id"], users[i]["phone"])
+							}()
+						}
+					}
+					msg.Text = finalUsers
+					msg.ReplyMarkup = ADMIN_mainPage_Keyboard
 				default:
 					msg.Text = description_command_not_found
 					msg.ReplyMarkup = ADMIN_mainPage_Keyboard

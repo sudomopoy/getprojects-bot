@@ -28,6 +28,7 @@ var (
 	label_help                   = "💡 راهنما "
 	label_support                = "☎️ پشتیبانی"
 	label_bot_designer           = "💻 طراح ربات"
+	label_users_list          = "لیست کاربران"
 	label_accept_bot_usage_roles = "✅ قوانین را میپذیرم"
 )
 var (

@@ -37,12 +37,9 @@ func GetAdmins() []int {
 	return GetAdminsIds()
 
 }
-func GetUsersInfo() {
-	users := GetFilterUser(bson.D{{"role", "user"}})
-	for i := 0; i < len(users); i++ {
-		//users[i]["_id"]
-	}
-	return
+func GetAllUsersInfo(pre string) []bson.M {
+	users := GetFilterUser(bson.D{{"role", pre}})
+	return users
 }
 func isPhoneNumberVerified(id int) bool {
 	user := GetFilterUser(bson.D{{"_id", id}})

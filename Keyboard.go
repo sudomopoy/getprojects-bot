@@ -39,7 +39,7 @@ var send_phone_number_Keyboard = tgbotapi.NewReplyKeyboard(
 
 var ADMIN_mainPage_Keyboard = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("لیست کاربران"),
+		tgbotapi.NewKeyboardButton(label_users_list),
 	),
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("لاگ"),
