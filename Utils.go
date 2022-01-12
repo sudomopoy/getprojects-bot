@@ -29,7 +29,7 @@ func log_excepts(_log string) {
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	check(err)
 	defer f.Close()
-	_, err = f.WriteString(_log)
+	_, err = f.WriteString(_log + "\n")
 	check(err)
 }
 
