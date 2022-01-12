@@ -8,7 +8,7 @@ import (
 )
 
 func Connect() *mongo.Database {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost).SetAuth(options.Credential{Username: mongoUsername, Password: mongoPassword}))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost))
 	if err != nil {
 		panic(err)
 	}
