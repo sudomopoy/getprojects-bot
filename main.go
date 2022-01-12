@@ -185,7 +185,10 @@ func main() {
 			msg.BaseChat.ReplyToMessageID = update.Message.MessageID
 
 			if _, err = bot.Send(msg); err != nil {
-				panic(err)
+				msg.Text = description_command_not_found
+				msg.ReplyMarkup = mainPage_Keyboard
+				RedisClientRemove(userId)
+				bot.Send(msg)
 			}
 		} else if update.CallbackQuery != nil {
 			callback := tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)
@@ -193,6 +196,7 @@ func main() {
 			}
 			userId := int(update.CallbackQuery.Message.Chat.ID)
 			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "")
+			//! ADMIN
 			if IsAdmin(int(userId)) {
 				data := update.CallbackQuery.Data
 				metaData := ""
@@ -205,9 +209,7 @@ func main() {
 				switch data {
 				case "accept_project":
 					pjId := metaData
-					if err != nil {
-						log.Fatalf("err")
-					}
+					check(err)
 					userId, title, description, username := UpdateSingleProject(pjId, bson.D{{"status", "accept"}})
 					msg.Text = label_project_accepted
 					chanelMessageText := func() string {
@@ -230,9 +232,7 @@ func main() {
 					bot.Send(tgbotapi.NewMessage(int64(userId), userMessageText))
 				case "denied_project":
 					pjId := metaData
-					if err != nil {
-						log.Fatalf("err")
-					}
+					check(err)
 					userId, title, _, _ := UpdateSingleProject(pjId, bson.D{{"status", "reject"}})
 					msg.Text = label_project_rejected
 					userMessageText := func() string {
