@@ -80,7 +80,7 @@ func main() {
 									if setPhoneNumber(userId, phoneNumber) {
 										msg.Text = "شماره تلفن تایید شد."
 										RedisClientRemove(userId)
-										msg.ReplyMarkup = ADMIN_mainPage_Keyboard
+										msg.ReplyMarkup = mainPage_Keyboard
 									} else {
 										msg.Text = "مشکلی پیش آمده."
 									}
