@@ -4,12 +4,26 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
+	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func main() {
+	if GetProccessMode() == "product" {
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn: "https://63ddf52733e346ed9eed3f93267bffc6@sentry.hamravesh.com/228",
+		})
+		if err != nil {
+			log.Fatalf("sentry.Init: %s", err)
+		}
+		// Flush buffered events before the program terminates.
+		defer sentry.Flush(2 * time.Second)
+
+		sentry.CaptureMessage("It works!")
+	}
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Fatal(err, " bot: ", token)

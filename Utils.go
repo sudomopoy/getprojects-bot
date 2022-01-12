@@ -35,6 +35,6 @@ func log_excepts(_log string) {
 
 func check(e error) {
 	if e != nil {
-		log.Fatal(e)
+		log.Fatalf("sentry.Init: %s", e)
 	}
 }

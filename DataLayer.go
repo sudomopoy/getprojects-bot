@@ -69,17 +69,25 @@ func GetAdminsIds() []int {
 	}
 	var res []int
 	for i := 0; i < len(admins); i++ {
-		fmt.Println(admins[i]["_id"])
-		fmt.Println(reflect.TypeOf(admins[i]["_id"]))
 		if reflect.TypeOf(admins[i]["_id"]).Kind() == reflect.Int32 {
-			fmt.Println("1")
 			res = append(res, int(admins[i]["_id"].(int32)))
 		} else {
-			fmt.Println("2")
 			res = append(res, int(admins[i]["_id"].(int64)))
 		}
 	}
 	return res
+}
+func GetFilterUser(filter bson.D) []bson.M {
+	ClCTX := Connect().Collection(collection_user)
+	cursor, err := ClCTX.Find(context.TODO(), filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var users []bson.M
+	if err = cursor.All(context.TODO(), &users); err != nil {
+		log.Fatal(err)
+	}
+	return users
 }
 
 func DBUpdateSingleProject(pjId string, NewArgs bson.D) bson.M {

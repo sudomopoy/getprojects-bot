@@ -32,3 +32,10 @@ func GetAdmins() []int {
 	return GetAdminsIds()
 
 }
+func GetUsersInfo() {
+	users := GetFilterUser(bson.D{{"role", "user"}})
+	for i := 0; i < len(users); i++ {
+		//users[i]["_id"]
+	}
+	return
+}
