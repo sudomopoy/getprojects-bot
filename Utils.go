@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"log"
 	"os"
 
 	"github.com/getsentry/sentry-go"
@@ -26,10 +27,13 @@ func log_excepts(_log string) {
 			return "/data/logs/user-logs.log"
 		}
 	}()
-	eve := sentry.NewEvent()
-	eve.Type = "Log"
-	eve.Message = _log
-	sentry.CaptureEvent(eve)
+	if GetProccessMode() == "product" {
+
+		eve := sentry.NewEvent()
+		eve.Type = "Log"
+		eve.Message = _log
+		sentry.CaptureEvent(eve)
+	}
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	check(err)
 	defer f.Close()
@@ -39,6 +43,10 @@ func log_excepts(_log string) {
 
 func check(e error) {
 	if e != nil {
-		sentry.CaptureException(e)
+		if GetProccessMode() == "product" {
+			sentry.CaptureException(e)
+		} else {
+			log.Fatal(e)
+		}
 	}
 }
