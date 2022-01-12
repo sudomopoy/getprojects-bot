@@ -12,18 +12,16 @@ import (
 )
 
 func main() {
-	if GetProccessMode() == "product" {
-		err := sentry.Init(sentry.ClientOptions{
-			Dsn: "https://63ddf52733e346ed9eed3f93267bffc6@sentry.hamravesh.com/228",
-		})
-		if err != nil {
-			log.Fatalf("sentry.Init: %s", err)
-		}
-		// Flush buffered events before the program terminates.
-		defer sentry.Flush(2 * time.Second)
-
-		sentry.CaptureMessage("It works!")
+	//	if GetProccessMode() == "product" {
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: "https://63ddf52733e346ed9eed3f93267bffc6@sentry.hamravesh.com/228",
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
 	}
+	// Flush buffered events before the program terminates.
+	defer sentry.Flush(2 * time.Second)
+	//	}
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Fatal(err, " bot: ", token)
@@ -79,9 +77,14 @@ func main() {
 						cache,
 					)
 				}())
-				if update.Message.Chat.UserName == "" {
+				if update.Message.Text == "/start" {
+					msg.Text = func() string {
+						return fmt.Sprintf(description_welcome, update.Message.Chat.FirstName)
+					}()
+					RedisClientRemove(userId)
+					msg.ReplyMarkup = mainPage_Keyboard
+				} else if update.Message.Chat.UserName == "" {
 					msg.Text = description_must_have_id
-
 				} else if cache == "GETTING_PHONE_NUMBER:0" {
 					var phoneNumber string = "---"
 					if update.Message != nil {

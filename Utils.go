@@ -3,9 +3,9 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"log"
 	"os"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/google/uuid"
 )
 
@@ -26,6 +26,10 @@ func log_excepts(_log string) {
 			return "/data/logs/user-logs.log"
 		}
 	}()
+	eve := sentry.NewEvent()
+	eve.Type = "Log"
+	eve.Message = _log
+	sentry.CaptureEvent(eve)
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	check(err)
 	defer f.Close()
@@ -35,6 +39,6 @@ func log_excepts(_log string) {
 
 func check(e error) {
 	if e != nil {
-		log.Fatalf("sentry.Init: %s", e)
+		sentry.CaptureException(e)
 	}
 }

@@ -28,7 +28,7 @@ var (
 	label_help                   = "💡 راهنما "
 	label_support                = "☎️ پشتیبانی"
 	label_bot_designer           = "💻 طراح ربات"
-	label_users_list          = "لیست کاربران"
+	label_users_list             = "لیست کاربران"
 	label_accept_bot_usage_roles = "✅ قوانین را میپذیرم"
 )
 var (
@@ -83,5 +83,11 @@ HTML, CSS, JS, C# , Go , C++
 و فقط هدف این کانال درج اگهی و تبلیغات هست
 
 ❗ درصورت گزارش تخلف، اگهی و فرد متخلف فورا از کانال حذف میشوند`
-	log_text = "username : %v user-id : %v text : %v first-name : %v last-name : %v bio : %v cache : %v"
+	log_text            = "username : %v user-id : %v text : %v first-name : %v last-name : %v bio : %v cache : %v"
+	description_welcome = `سلام %v 🖐
+	به  کانال Get Projects خوش اومدی!
+	🔹 اينجا تو ميتونی به راحتي آگهیت رو درج كنی، فقط کافیه دکمه ثبت آگهی رو انتخاب بکنی
+	
+	🔸 اگر انتقاد، نظر و یا پیشنهادی داشتید میتونید با آیدی زیر در میون بزارید
+	@GetProjectsAdmin`
 )
