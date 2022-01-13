@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"labix.org/v2/mgo"
 )
@@ -24,7 +25,20 @@ import (
 // 	return client.Database(mongoDatabase)
 // }
 func Connect() *mgo.Database {
-	session, err := mgo.Dial(mongoHost)
+	var session *mgo.Session
+	var err error
+	if GetProccessMode() == "product" {
+		mongoDBDialInfo := &mgo.DialInfo{
+			Addrs:    []string{mongoHost},
+			Timeout:  60 * time.Second,
+			Username: mongoUsername,
+			Password: mongoUsername,
+		}
+		session, err = mgo.DialWithInfo(mongoDBDialInfo)
+	} else {
+		session, err = mgo.Dial(mongoHost)
+	}
+
 	if err != nil {
 		fmt.Printf("dial fail %v\n", err)
 		os.Exit(1)
