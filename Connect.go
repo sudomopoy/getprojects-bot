@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"labix.org/v2/mgo"
 )
 
@@ -24,12 +26,14 @@ func Connect() *mgo.Database {
 	var session *mgo.Session
 	var err error
 	if GetProccessMode() == "product" {
-		session, err = mgo.Dial(`mongodb://root:NG43ubjnbXjsxdWW3me699QyQCu7XW48@get-projects-bot-mongo.mohsen8.svc:27017/?authSource=admin&authMechanism=SCRAM-SHA-256&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false`)
+		session, err = mgo.Dial(mongoUrl)
 	} else {
 		session, err = mgo.Dial(mongoHost)
 	}
 
-	check(err)
+	if check(err) {
+		os.Exit(1)
+	}
 	//error check on every access
 	//session.SetSafe(&mgo.Safe{})
 	return session.DB(mongoDatabase)
