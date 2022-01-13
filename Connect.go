@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"crypto/tls"
+	"net"
 	"time"
 
 	"labix.org/v2/mgo"
@@ -28,22 +28,23 @@ func Connect() *mgo.Database {
 	var session *mgo.Session
 	var err error
 	if GetProccessMode() == "product" {
+		tlsConfig := &tls.Config{}
 		mongoDBDialInfo := &mgo.DialInfo{
 			Addrs:    []string{mongoHost},
 			Timeout:  60 * time.Second,
 			Username: mongoUsername,
 			Password: mongoUsername,
 		}
+		mongoDBDialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
+			conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
+			return conn, err
+		}
 		session, err = mgo.DialWithInfo(mongoDBDialInfo)
 	} else {
 		session, err = mgo.Dial(mongoHost)
 	}
 
-	if err != nil {
-		fmt.Printf("dial fail %v\n", err)
-		os.Exit(1)
-	}
-
+	check(err)
 	//error check on every access
 	session.SetSafe(&mgo.Safe{})
 	return session.DB(mongoDatabase)

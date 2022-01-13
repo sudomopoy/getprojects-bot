@@ -19,6 +19,13 @@ var mongoUsername = func() string {
 		return getEnv("MONGODB_USERNAME")
 	}
 }()
+var mongoUrl = func() string {
+	if GetProccessMode() == "development" {
+		return "mongodb://root:NG43ubjnbXjsxdWW3me699QyQCu7XW48@eb11f1d5-3660-4ac0-ba99-02f01bb5238d.hsvc.ir:32326/?authSource=admin&authMechanism=SCRAM-SHA-256&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false"
+	} else {
+		return getEnv("MONGODB_URL")
+	}
+}()
 var mongoPassword = func() string {
 	if GetProccessMode() == "development" {
 		return "---"
