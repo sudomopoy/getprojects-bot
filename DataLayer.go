@@ -9,57 +9,53 @@ import (
 var todoCTX = context.TODO()
 
 func CreateSingleProject(newProject SingleProjectModel) bool {
-	Collection := Connect().Collection(collection_project)
-	_, err := Collection.InsertOne(todoCTX, newProject)
+	Collection := Connect().C(collection_project)
+	err := Collection.Insert(newProject)
 	check(err)
 	return true
 }
-func GetSingleProject(filterProject SingleProjectModel) SingleProjectModel {
-	Collection := Connect().Collection(collection_project)
+func GetSingleProject(filterProject bson.M) SingleProjectModel {
+	Collection := Connect().C(collection_project)
 	var selectedProject SingleProjectModel
-	err := Collection.FindOne(todoCTX, filterProject).Decode(&selectedProject)
-	check(err)
+	Collection.Find(filterProject).One(&selectedProject)
 	return selectedProject
 }
 func GetFilteredProjects(filterProject SingleProjectModel) []SingleProjectModel {
-	Collection := Connect().Collection(collection_project)
-	cursor, err := Collection.Find(todoCTX, filterProject)
-	check(err)
+	Collection := Connect().C(collection_project)
+	cursor := Collection.Find(filterProject)
 	var selectedProjects []SingleProjectModel
-	err = cursor.All(todoCTX, &selectedProjects)
+	err := cursor.All(&selectedProjects)
 	check(err)
 	return selectedProjects
 }
-func SetUpdateSingleProject(filterProject SingleProjectModel, updateTo SingleProjectModel) bool {
-	Collection := Connect().Collection(collection_project)
-	_, err := Collection.UpdateOne(todoCTX, filterProject, bson.D{{"$set", updateTo}})
+func SetUpdateSingleProject(filterProject bson.M, updateTo SingleProjectModel) bool {
+	Collection := Connect().C(collection_project)
+	err := Collection.Update(filterProject, updateTo)
 	check(err)
 	return true
 }
 func CreateSingleUser(newUser SingleUserModel) bool {
-	Collection := Connect().Collection(collection_user)
-	_, err := Collection.InsertOne(todoCTX, newUser)
+	Collection := Connect().C(collection_user)
+	err := Collection.Insert(&newUser)
 	check(err)
 	return true
 }
-func GetSingleUser(filterUser SingleUserModel) (SingleUserModel, bool) {
-	Collection := Connect().Collection(collection_user)
+func GetSingleUser(filterUser bson.M) SingleUserModel {
+	Collection := Connect().C(collection_user)
 	var selectedUser SingleUserModel
-	err := Collection.FindOne(todoCTX, filterUser).Decode(&selectedUser)
-	return selectedUser, check(err)
+	Collection.Find(filterUser).One(&selectedUser)
+	return selectedUser
 }
-func GetFilteredUsers(filterUser SingleUserModel) []SingleUserModel {
-	Collection := Connect().Collection(collection_user)
-	cursor, err := Collection.Find(todoCTX, filterUser)
-	check(err)
+func GetFilteredUsers(filterUser bson.M) []SingleUserModel {
+	Collection := Connect().C(collection_user)
+	cursor := Collection.Find(filterUser)
 	var selectedUsers []SingleUserModel
-	err = cursor.All(context.TODO(), &selectedUsers)
+	err := cursor.All(&selectedUsers)
 	check(err)
 	return selectedUsers
 }
-func SetUpdateSingleUser(filterUser SingleUserModel, updateTo SingleUserModel) bool {
-	Collection := Connect().Collection(collection_user)
-	_, err := Collection.UpdateOne(todoCTX, filterUser, bson.D{{"$set", updateTo}})
-	check(err)
-	return true
+func SetUpdateSingleUser(filterUser bson.M, updateTo SingleUserModel) bool {
+	Collection := Connect().C(collection_user)
+	err := Collection.Update(filterUser, updateTo)
+	return check(err)
 }

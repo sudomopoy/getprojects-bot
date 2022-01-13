@@ -1,90 +1,91 @@
 package main
 
-import "time"
+import (
+	"time"
 
-func SetUserBaseInfoIfNotExists(userBaseInfo SingleUserModel) SingleUserModel {
-	selectUserFilter := SingleUserModel{
-		_id: userBaseInfo._id,
-	}
-	userInfo, hasErr := GetSingleUser(selectUserFilter)
-	if hasErr {
-		userInfo.firstName = userBaseInfo.firstName
-		userInfo.lastName = userBaseInfo.lastName
-		userInfo.bio = userBaseInfo.bio
-		userInfo.role = USER_ROLE
-		userInfo.status = USER_STATUS_BLOCKED
-		userInfo.phoneNumber = USER_PHONENUMBER_STATE_NOT_SET
-		userInfo.created_at = time.Now()
-		hasErr = CreateSingleUser(userInfo)
+	"go.mongodb.org/mongo-driver/bson"
+)
 
-		if !hasErr {
-			_, hasErr = GetSingleUser(userInfo)
-		}
+func SetUserBaseInfoIfNotExists(userBaseInfo SingleUserModel) (SingleUserModel, bool) {
+	selectUserFilter := bson.M{"_id": userBaseInfo.ID}
+	userInfo := GetSingleUser(selectUserFilter)
+
+	if userInfo.ID == "" {
+		userInfo.ID = userBaseInfo.ID
+		userInfo.FirstName = userBaseInfo.FirstName
+		userInfo.LastName = userBaseInfo.LastName
+		userInfo.Role = USER_ROLE
+		userInfo.UserName = userBaseInfo.UserName
+		userInfo.Bio = userBaseInfo.Bio
+		userInfo.Status = USER_STATUS_FREE
+		userInfo.PhoneNumber = USER_PHONENUMBER_STATE_NOT_SET
+		userInfo.Created_at = time.Now()
+		CreateSingleUser(userInfo)
+		return userInfo, true
 	}
+	return userInfo, false
+}
+func GetSingleUserInfo(userBaseInfo SingleUserModel) SingleUserModel {
+	selectUserFilter := bson.M{"_id": userBaseInfo.ID}
+
+	userInfo := GetSingleUser(selectUserFilter)
 	return userInfo
 }
-
 func GetSingleUserRole(userBaseInfo SingleUserModel) string {
-	selectUserFilter := SingleUserModel{
-		_id: userBaseInfo._id,
-	}
-	userInfo, _ := GetSingleUser(selectUserFilter)
-	return userInfo.role
+	selectUserFilter := bson.M{"_id": userBaseInfo.ID}
+
+	userInfo := GetSingleUser(selectUserFilter)
+	return userInfo.Role
 }
+
 func GetSingleUserUserName(userBaseInfo SingleUserModel) string {
-	selectUserFilter := SingleUserModel{
-		_id: userBaseInfo._id,
-	}
-	userInfo, _ := GetSingleUser(selectUserFilter)
-	return userInfo.userName
+	selectUserFilter := bson.M{"_id": userBaseInfo.ID}
+
+	userInfo := GetSingleUser(selectUserFilter)
+	return userInfo.UserName
 }
 func GetSingleUserPhoneNumber(userBaseInfo SingleUserModel) string {
-	selectUserFilter := SingleUserModel{
-		_id: userBaseInfo._id,
-	}
-	userInfo, _ := GetSingleUser(selectUserFilter)
-	return userInfo.phoneNumber
+	selectUserFilter := bson.M{"_id": userBaseInfo.ID}
+
+	userInfo := GetSingleUser(selectUserFilter)
+	return userInfo.PhoneNumber
 }
 func GetAllUsersInfo() []SingleUserModel {
-	selectUserFilter := SingleUserModel{
-		role: USER_ROLE,
-	}
+	selectUserFilter := bson.M{"role": USER_ROLE}
+
 	usersList := GetFilteredUsers(selectUserFilter)
 	return usersList
 }
 func GetAllAdminsInfo() []SingleUserModel {
-	selectUserFilter := SingleUserModel{
-		role: ADMIN_ROLE,
-	}
+	selectUserFilter := bson.M{"role": ADMIN_ROLE}
+
 	adminsList := GetFilteredUsers(selectUserFilter)
 	return adminsList
 }
 func UpdateSingleUserInfo(userBaseInfo SingleUserModel) bool {
-	selectUserFilter := SingleUserModel{
-		_id: userBaseInfo._id,
-	}
+	selectUserFilter := bson.M{"_id": userBaseInfo.ID}
 	hasErr := SetUpdateSingleUser(selectUserFilter, userBaseInfo)
 	return hasErr
 }
 func CreateNewProjectBase(projectBaseInfo SingleProjectModel) (SingleProjectModel, bool) {
-	projectBaseInfo.status = PROJECT_STATUS_PENDING
-	projectBaseInfo._id = idGenarator()
-	projectBaseInfo.channelPostId = -1
-	projectBaseInfo.created_at = time.Now()
+	projectBaseInfo.Status = PROJECT_STATUS_PENDING
+	projectBaseInfo.ID = idGenarator()
+	projectBaseInfo.ChannelPostId = -1
+	projectBaseInfo.Created_at = time.Now()
 	hasErr := CreateSingleProject(projectBaseInfo)
 	return projectBaseInfo, hasErr
 }
 func GetSingleProjectInfo(projectBaseInfo SingleProjectModel) SingleProjectModel {
-	selectProjectFilter := SingleProjectModel{
-		_id: projectBaseInfo._id,
+	selectProjectFilter := bson.M{
+		"_id": projectBaseInfo.ID,
 	}
-	selectProjectFilter = GetSingleProject(selectProjectFilter)
-	return selectProjectFilter
+	selectProject := GetSingleProject(selectProjectFilter)
+	return selectProject
 }
 func UpdateSingleProjectInfo(projectBaseInfo SingleProjectModel) bool {
-	selectprojectFilter := SingleProjectModel{
-		_id: projectBaseInfo._id,
+	selectProjectFilter := bson.M{
+		"_id": projectBaseInfo.ID,
 	}
-	hasErr := SetUpdateSingleProject(selectprojectFilter, projectBaseInfo)
+	hasErr := SetUpdateSingleProject(selectProjectFilter, projectBaseInfo)
 	return hasErr
 }

@@ -1,26 +1,38 @@
 package main
 
 import (
-	"context"
+	"fmt"
+	"os"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"labix.org/v2/mgo"
 )
 
-func Connect() *mongo.Database {
-	var client *mongo.Client
-	var err error
-	if GetProccessMode() == "product" {
-		credential := options.Credential{
-			Username: mongoUsername,
-			Password: mongoPassword,
-		}
-		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost).SetAuth(credential))
-	} else {
-		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost))
+// func Connect() *mongo.Database {
+
+// 	var client *mongo.Client
+// 	var err error
+// 	if GetProccessMode() == "product" {
+// 		credential := options.Credential{
+// 			Username: mongoUsername,
+// 			Password: mongoPassword,
+// 		}
+// 		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost).SetAuth(credential))
+// 	} else {
+// 		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost))
+// 	}
+// 	check(err)
+// 	return client.Database(mongoDatabase)
+// }
+func Connect() *mgo.Database {
+	session, err := mgo.Dial(mongoHost)
+	if err != nil {
+		fmt.Printf("dial fail %v\n", err)
+		os.Exit(1)
 	}
-	check(err)
-	return client.Database(mongoDatabase)
+
+	//error check on every access
+	session.SetSafe(&mgo.Safe{})
+	return session.DB(mongoDatabase)
 }
 
 /*
