@@ -31,7 +31,7 @@ func Connect() *mgo.Database {
 
 	check(err)
 	//error check on every access
-	session.SetSafe(&mgo.Safe{})
+	//session.SetSafe(&mgo.Safe{})
 	return session.DB(mongoDatabase)
 }
 
