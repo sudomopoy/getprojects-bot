@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func main() {
@@ -37,31 +37,42 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 	for update := range updates {
 		if update.ChannelPost != nil {
-			fmt.Println(update.ChannelPost.Chat.ID)
+			sentry.CaptureMessage(strconv.Itoa(int(update.ChannelPost.Chat.ID)))
 		} else if update.Message != nil {
-			userId := int(update.Message.Chat.ID)
-			msg := tgbotapi.NewMessage(int64(userId), "")
-			SetUserBaseInfoIfNotExists(userId)
-			if IsAdmin(int(userId)) { // !ADMIN
-				data := update.Message.Text
+			var userBaseInfo SingleUserModel = SingleUserModel{
+				_id:       strconv.FormatInt(update.Message.Chat.ID, 10),
+				firstName: update.Message.Chat.FirstName,
+				lastName:  update.Message.Chat.LastName,
+				bio:       update.Message.Chat.Bio,
+				userName:  update.Message.Chat.UserName,
+			}
+			userId, err := strconv.Atoi(userBaseInfo._id)
+			check(err)
+			msg := tgbotapi.NewMessage(int64(userId), "---")
+			userBaseInfo = SetUserBaseInfoIfNotExists(userBaseInfo)
+			if GetSingleUserRole(userBaseInfo) == ADMIN_ROLE { // !ADMIN AREA
+				messageData := update.Message.Text
 				msg.Text = label_home
-				switch data {
+				switch messageData {
 				case "/start":
 					msg.ReplyMarkup = ADMIN_mainPage_Keyboard
 				case label_users_list:
-					users := GetAllUsersInfo("user")
-					var finalUsers string = ""
-					for i := 0; i < len(users); i++ {
-						if users[i]["phone"] != "NotSet" {
+					allUsersList := GetAllUsersInfo()
+					var finalUsers string = "---"
+					for i := 0; i < len(allUsersList); i++ {
+						if allUsersList[i].phoneNumber != USER_PHONENUMBER_STATE_NOT_SET {
 							finalUsers += func() string {
-								return fmt.Sprintf("کاربر : %v , شماره تلفن : %v \n", users[i]["_id"], users[i]["phone"])
+								return fmt.Sprintf("کاربر : %v , شماره تلفن : %v \n", allUsersList[i]._id, allUsersList[i].phoneNumber)
 							}()
 						}
+					}
+					if finalUsers == "---" {
+						finalUsers = label_user_not_found
 					}
 					msg.Text = finalUsers
 					msg.ReplyMarkup = ADMIN_mainPage_Keyboard
 				default:
-					msg.Text = description_command_not_found
+					msg.Text = description_command_not_found + "d"
 					msg.ReplyMarkup = ADMIN_mainPage_Keyboard
 				}
 			} else { // !USER
@@ -92,12 +103,14 @@ func main() {
 							phoneNumber = update.Message.Contact.PhoneNumber
 							if userId == int(update.Message.Contact.UserID) && phoneNumber != "---" {
 								if IranianPhoneValidate(phoneNumber) {
-									if setPhoneNumber(userId, phoneNumber) {
+									userBaseInfo.phoneNumber = phoneNumber
+									if UpdateSingleUserInfo(userBaseInfo) {
 										msg.Text = "شماره تلفن تایید شد."
 										RedisClientRemove(userId)
 										msg.ReplyMarkup = mainPage_Keyboard
 									} else {
 										msg.Text = "مشکلی پیش آمده."
+										userBaseInfo.phoneNumber = "---"
 									}
 								} else {
 									msg.Text = "شماره تلفن میبایست ایرانی باشد"
@@ -107,8 +120,9 @@ func main() {
 					}
 					if msg.Text == "" {
 						msg.Text = "لطفا شماره تلفن خود را به اشتراک بگذارید."
+						userBaseInfo.phoneNumber = "---"
 					}
-				} else if isPhoneNumberVerified(userId) {
+				} else if GetSingleUserPhoneNumber(userBaseInfo) == USER_PHONENUMBER_STATE_NOT_SET {
 					msg.ReplyMarkup = send_phone_number_Keyboard
 					msg.Text = description_should_have_phone_number
 					RedisClientSet(userId, "GETTING_PHONE_NUMBER:0")
@@ -126,21 +140,33 @@ func main() {
 						msg.ReplyMarkup = i_want_to_cancel_enter_project_Keyboard
 						msg.Text = label_please_enter_poster_description
 					case "ENTER_PROJECT_STEP+2":
-						res, pjId := AddNewProject(metaData, update.Message.Text, userId, update.Message.Chat.UserName)
-						msg.Text = res
+						projectTitle := metaData
+						projectDescription := update.Message.Text
+						var projectBaseInfo SingleProjectModel = SingleProjectModel{
+							userId:      userBaseInfo._id,
+							title:       projectTitle,
+							description: projectDescription,
+						}
+						projectBaseInfo, hasErr := CreateNewProjectBase(projectBaseInfo)
+
+						if hasErr {
+							msg.Text = label_project_entered
+						} else {
+							msg.Text = label_has_problem
+						}
 						RedisClientRemove(userId)
 
-						admins := GetAdmins()
-						for i := 0; i < len(admins); i++ {
-							adminId := admins[i]
+						allAdmins := GetAllAdminsInfo()
+						for i := 0; i < len(allAdmins); i++ {
+							adminId, _ := strconv.Atoi(allAdmins[i]._id)
 							messageTextForAdmin := func() string {
 								return fmt.Sprintf(description_new_project_from_user, userId, metaData, update.Message.Text)
 							}()
 							messageForAdmin := tgbotapi.NewMessage(int64(adminId), messageTextForAdmin)
 							var new_project_accept_or_denied = tgbotapi.NewInlineKeyboardMarkup(
 								tgbotapi.NewInlineKeyboardRow(
-									tgbotapi.NewInlineKeyboardButtonData(label_accept, "accept_project:"+pjId),
-									tgbotapi.NewInlineKeyboardButtonData(label_reject, "denied_project:"+pjId),
+									tgbotapi.NewInlineKeyboardButtonData(label_accept, "accept_project:"+projectBaseInfo._id),
+									tgbotapi.NewInlineKeyboardButtonData(label_reject, "denied_project:"+projectBaseInfo._id),
 								),
 							)
 							messageForAdmin.ReplyMarkup = new_project_accept_or_denied
@@ -172,7 +198,14 @@ func main() {
 						msg.ReplyMarkup = i_want_to_cancel_enter_project_Keyboard
 						msg.Text = label_please_enter_poster_title
 					case token + password:
-						msg.Text = SetAdmin(int(userId))
+						userBaseInfo.role = ADMIN_ROLE
+						hasErr := UpdateSingleUserInfo(userBaseInfo)
+						if hasErr {
+							msg.Text = label_has_problem
+
+						} else {
+							msg.Text = label_admin_added
+						}
 						RedisClientRemove(userId)
 						msg.ReplyMarkup = mainPage_Keyboard
 					default:
@@ -194,10 +227,19 @@ func main() {
 			callback := tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)
 			if _, err := bot.Request(callback); err != nil {
 			}
-			userId := int(update.CallbackQuery.Message.Chat.ID)
-			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "")
-			//! ADMIN
-			if IsAdmin(int(userId)) {
+			var userBaseInfo SingleUserModel = SingleUserModel{
+				_id:       strconv.FormatInt(update.Message.Chat.ID, 10),
+				firstName: update.Message.Chat.FirstName,
+				lastName:  update.Message.Chat.LastName,
+				bio:       update.Message.Chat.Bio,
+				userName:  update.Message.Chat.UserName,
+			}
+			userId, err := strconv.Atoi(userBaseInfo._id)
+			check(err)
+			msg := tgbotapi.NewMessage(int64(userId), "---")
+			userBaseInfo = SetUserBaseInfoIfNotExists(userBaseInfo)
+			//! ADMIN AREA
+			if GetSingleUserRole(userBaseInfo) == ADMIN_ROLE {
 				data := update.CallbackQuery.Data
 				metaData := ""
 				if strings.Contains(data, ":") {
@@ -208,18 +250,24 @@ func main() {
 				msg.Text = label_home
 				switch data {
 				case "accept_project":
-					pjId := metaData
-					check(err)
-					pjStatus, pjTitle := GetSingleProjectStatus(pjId)
-					if pjStatus == "pending" {
-						userId, title, description, username := UpdateSingleProject(pjId, bson.D{{"status", "accept"}})
+					projectId := metaData
+					var projectBaseInfo SingleProjectModel = SingleProjectModel{
+						_id: projectId,
+					}
+					projectBaseInfo = GetSingleProjectInfo(projectBaseInfo)
+					if projectBaseInfo.status == PROJECT_STATUS_PENDING {
+						projectBaseInfo.status = PROJECT_STATUS_ACCEPTED
+						UpdateSingleProjectInfo(projectBaseInfo)
 						msg.Text = label_project_accepted
 						chanelMessageText := func() string {
-							return fmt.Sprintf(description_project_poster, title, description)
+							return fmt.Sprintf(description_project_poster, projectBaseInfo.title, projectBaseInfo.description)
 						}()
+						userTempInfo := SingleUserModel{
+							_id: projectBaseInfo.userId,
+						}
 						var project_in_chanel = tgbotapi.NewInlineKeyboardMarkup(
 							tgbotapi.NewInlineKeyboardRow(
-								tgbotapi.NewInlineKeyboardButtonURL(label_message_to_owner, "t.me/"+username),
+								tgbotapi.NewInlineKeyboardButtonURL(label_message_to_owner, "t.me/"+GetSingleUserUserName(userTempInfo)),
 							),
 							tgbotapi.NewInlineKeyboardRow(
 								tgbotapi.NewInlineKeyboardButtonURL(label_message_enter_same_project, "t.me/getprojectsbot"),
@@ -228,22 +276,27 @@ func main() {
 						chanelMessage := tgbotapi.NewMessage(masterChannelId, chanelMessageText)
 						chanelMessage.ReplyMarkup = project_in_chanel
 						userMessageText := func() string {
-							return fmt.Sprintf(description_project_accepted, title)
+							return fmt.Sprintf(description_project_accepted, projectBaseInfo.title)
 						}()
 						bot.Send(chanelMessage)
 						bot.Send(tgbotapi.NewMessage(int64(userId), userMessageText))
 					} else {
 						msg.Text = func() string {
-							return fmt.Sprintf(label_project_status_connot_edit, pjTitle)
+							return fmt.Sprintf(label_project_status_connot_edit, projectBaseInfo.title)
 						}()
 					}
 				case "denied_project":
-					pjId := metaData
+					projectId := metaData
 					check(err)
-					userId, title, _, _ := UpdateSingleProject(pjId, bson.D{{"status", "reject"}})
+					var projectBaseInfo SingleProjectModel = SingleProjectModel{
+						_id: projectId,
+					}
+					projectBaseInfo = GetSingleProjectInfo(projectBaseInfo)
+					projectBaseInfo.status = PROJECT_STATUS_REJECTED
+					UpdateSingleProjectInfo(projectBaseInfo)
 					msg.Text = label_project_rejected
 					userMessageText := func() string {
-						return fmt.Sprintf(description_project_rejected, title)
+						return fmt.Sprintf(description_project_rejected, projectBaseInfo.title)
 					}()
 					bot.Send(tgbotapi.NewMessage(int64(userId), userMessageText))
 				default:

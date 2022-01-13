@@ -2,115 +2,64 @@ package main
 
 import (
 	"context"
-	"log"
-	"reflect"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-var ctx = context.Background()
+var todoCTX = context.TODO()
 
-func DBSetAdmin(id int) bool {
-	ClCTX := Connect().Collection(collection_user)
-	user := bson.D{{"role", "admin"}, {"admin-token", HashGen(token)}} // {"fullName", "User 1"}, {"age", 30}
-	ClCTX.UpdateOne(context.TODO(), bson.D{{"_id", id}}, bson.D{{"$set", user}})
+func CreateSingleProject(newProject SingleProjectModel) bool {
+	Collection := Connect().Collection(collection_project)
+	_, err := Collection.InsertOne(todoCTX, newProject)
+	check(err)
 	return true
 }
-func updateSingleUser(id int, to bson.D) bool {
-	ClCTX := Connect().Collection(collection_user)
-	_, err := ClCTX.UpdateOne(context.TODO(), bson.D{{"_id", id}}, bson.D{{"$set", to}})
+func GetSingleProject(filterProject SingleProjectModel) SingleProjectModel {
+	Collection := Connect().Collection(collection_project)
+	var selectedProject SingleProjectModel
+	err := Collection.FindOne(todoCTX, filterProject).Decode(&selectedProject)
 	check(err)
-	if err != nil {
-		return false
-	}
+	return selectedProject
+}
+func GetFilteredProjects(filterProject SingleProjectModel) []SingleProjectModel {
+	Collection := Connect().Collection(collection_project)
+	cursor, err := Collection.Find(todoCTX, filterProject)
+	check(err)
+	var selectedProjects []SingleProjectModel
+	err = cursor.All(todoCTX, &selectedProjects)
+	check(err)
+	return selectedProjects
+}
+func SetUpdateSingleProject(filterProject SingleProjectModel, updateTo SingleProjectModel) bool {
+	Collection := Connect().Collection(collection_project)
+	_, err := Collection.UpdateOne(todoCTX, filterProject, bson.D{{"$set", updateTo}})
+	check(err)
 	return true
 }
-
-func IsAdmin(id int) bool {
-	result := false
-	if !CollectionIsEmpty(collection_user) {
-		ClCTX := Connect().Collection(collection_user)
-		var userM bson.M
-		if err := ClCTX.FindOne(context.TODO(), bson.D{{"_id", id}}).Decode(&userM); err != nil {
-			log.Fatal(err)
-		}
-		result = userM["role"] == "admin"
-	}
-	return result
-}
-func SetUserBaseInfoIfNotExists(id int) bool {
-	result := false
-	ClCTX := Connect().Collection(collection_user)
-	user := bson.D{{"_id", id}} // {"fullName", "User 1"}, {"age", 30}
-	cu, err := ClCTX.CountDocuments(context.TODO(), user)
-	if err != nil {
-		return false
-	}
-	if cu == 0 {
-		user := bson.D{{"_id", id}, {"role", "user"}, {"phone", "NotSet"}} // {"fullName", "User 1"}, {"age", 30}
-		ClCTX.InsertOne(context.TODO(), user)
-	}
-	return result
-}
-
-func CollectionIsEmpty(clName string) bool {
-	ClCTX := Connect().Collection(clName)
-	Count, _ := ClCTX.CountDocuments(context.TODO(), bson.D{})
-	return int(Count) == 0
-}
-func AddNewProjectBaseInfo(title string, description string, userId int, username string) (bool, string) {
-	ClCTX := Connect().Collection(collection_projects)
-	pjId := idGenarator()
-	project := bson.D{{"_id", pjId}, {"userId", userId}, {"title", title}, {"description", description}, {"status", "pending"}, {"username", username}} // {"fullName", "User 1"}, {"age", 30}
-	ClCTX.InsertOne(context.TODO(), project)
-	return true, pjId
-}
-func GetAdminsIds() []int {
-	ClCTX := Connect().Collection(collection_user)
-	cursor, err := ClCTX.Find(context.TODO(), bson.D{{"role", "admin"}})
-	if err != nil {
-		log.Fatal(err)
-	}
-	var admins []bson.M
-	if err = cursor.All(context.TODO(), &admins); err != nil {
-		log.Fatal(err)
-	}
-	var res []int
-	for i := 0; i < len(admins); i++ {
-		if reflect.TypeOf(admins[i]["_id"]).Kind() == reflect.Int32 {
-			res = append(res, int(admins[i]["_id"].(int32)))
-		} else {
-			res = append(res, int(admins[i]["_id"].(int64)))
-		}
-	}
-	return res
-}
-func GetFilterUser(filter bson.D) []bson.M {
-	ClCTX := Connect().Collection(collection_user)
-	cursor, err := ClCTX.Find(context.TODO(), filter)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var users []bson.M
-	if err = cursor.All(context.TODO(), &users); err != nil {
-		log.Fatal(err)
-	}
-	return users
-}
-
-func DBUpdateSingleProject(pjId string, NewArgs bson.D) bson.M {
-	ClCTX := Connect().Collection(collection_projects)
-	ClCTX.UpdateOne(context.TODO(), bson.D{{"_id", pjId}}, bson.D{{"$set", NewArgs}})
-	var prjRes bson.M
-	err := ClCTX.FindOne(context.TODO(), bson.D{{"_id", pjId}}).Decode(&prjRes)
+func CreateSingleUser(newUser SingleUserModel) bool {
+	Collection := Connect().Collection(collection_user)
+	_, err := Collection.InsertOne(todoCTX, newUser)
 	check(err)
-	return prjRes
+	return true
 }
-
-func GetSingleProject(_id string) bson.M {
-	ClCTX := Connect().Collection(collection_projects)
-	var prjRes bson.M
-	err := ClCTX.FindOne(context.TODO(), bson.D{{"_id", _id}}).Decode(&prjRes)
+func GetSingleUser(filterUser SingleUserModel) (SingleUserModel, bool) {
+	Collection := Connect().Collection(collection_user)
+	var selectedUser SingleUserModel
+	err := Collection.FindOne(todoCTX, filterUser).Decode(&selectedUser)
+	return selectedUser, check(err)
+}
+func GetFilteredUsers(filterUser SingleUserModel) []SingleUserModel {
+	Collection := Connect().Collection(collection_user)
+	cursor, err := Collection.Find(todoCTX, filterUser)
 	check(err)
-	return prjRes
+	var selectedUsers []SingleUserModel
+	err = cursor.All(context.TODO(), &selectedUsers)
+	check(err)
+	return selectedUsers
+}
+func SetUpdateSingleUser(filterUser SingleUserModel, updateTo SingleUserModel) bool {
+	Collection := Connect().Collection(collection_user)
+	_, err := Collection.UpdateOne(todoCTX, filterUser, bson.D{{"$set", updateTo}})
+	check(err)
+	return true
 }

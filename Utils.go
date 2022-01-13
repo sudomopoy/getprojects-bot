@@ -3,7 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/getsentry/sentry-go"
@@ -41,12 +41,15 @@ func log_excepts(_log string) {
 	check(err)
 }
 
-func check(e error) {
+func check(e error) bool {
 	if e != nil {
 		if GetProccessMode() == "product" {
 			sentry.CaptureException(e)
 		} else {
-			log.Fatal(e)
+			fmt.Printf("%s", e)
 		}
+		return true
+	} else {
+		return false
 	}
 }

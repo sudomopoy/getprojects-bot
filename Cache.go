@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
 )
+
+var ctx = context.Background()
 
 func RedisCacheConnect() *redis.Client {
 	rdb := redis.NewClient(&redis.Options{

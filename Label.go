@@ -7,11 +7,14 @@ var (
 	label_accept                          = "تایید"
 	label_reject                          = "رد"
 	label_project_accepted                = "پروژه تایید شد✅"
+	label_user_not_found                = "کاربری یافت نشد"
+	label_has_problem                     = "مشکلی پیش آمده! لطفا بعدا دوباره امتحان کنید"
 	label_project_entered                 = "✅ پروژه ثبت گردید. پس از تایید انتشار میابد."
 	label_project_rejected                = "پروژه رد شد🚫"
 	label_message_to_owner                = "پیام به کارفرما"
 	label_project_status_connot_edit      = "وضعیت پروژه %v قبلا مشخص شده و قابل تغییر نیست."
 	label_message_enter_same_project      = "ثبت پروژه مشابه"
+	label_admin_added                     = "ادمین اضافه شد"
 	label_please_enter_poster_title       = `
 	👇 عنوان کلی آگهی خود را ارسال کنید
 برای مثال: طراحی وب سایت

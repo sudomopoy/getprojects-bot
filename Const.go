@@ -1,6 +1,21 @@
 package main
 
 const (
-	collection_user     = "user_collection_gsf1a56er4a"
-	collection_projects = "projects_collection_ksr51k3et5"
+	collection_user    = "USER_COLLECTION_74PSXZFLWS"
+	collection_project = "PROJECT_COLLECTION_APDGEP67WQ"
+)
+
+const (
+	USER_ROLE  = "USER"
+	ADMIN_ROLE = "ADMIN"
+)
+const (
+	USER_STATUS_FREE               = "FREE"
+	USER_STATUS_BLOCKED            = "BLOCKED"
+	USER_PHONENUMBER_STATE_NOT_SET = "NOT_SET"
+)
+const (
+	PROJECT_STATUS_PENDING  = "PENDING"
+	PROJECT_STATUS_ACCEPTED = "ACCEPTED"
+	PROJECT_STATUS_REJECTED = "REJECTED"
 )

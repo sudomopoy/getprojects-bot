@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -11,8 +10,6 @@ import (
 func Connect() *mongo.Database {
 	var client *mongo.Client
 	var err error
-	fmt.Println(mongoUsername)
-	fmt.Println(mongoPassword)
 	if GetProccessMode() == "product" {
 		credential := options.Credential{
 			Username: mongoUsername,
