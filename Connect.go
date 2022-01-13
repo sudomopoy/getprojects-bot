@@ -1,10 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
-	"net"
-	"time"
-
 	"labix.org/v2/mgo"
 )
 
@@ -28,18 +24,7 @@ func Connect() *mgo.Database {
 	var session *mgo.Session
 	var err error
 	if GetProccessMode() == "product" {
-		tlsConfig := &tls.Config{}
-		mongoDBDialInfo := &mgo.DialInfo{
-			Addrs:    []string{mongoHost},
-			Timeout:  60 * time.Second,
-			Username: mongoUsername,
-			Password: mongoUsername,
-		}
-		mongoDBDialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
-			conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
-			return conn, err
-		}
-		session, err = mgo.DialWithInfo(mongoDBDialInfo)
+		session, err = mgo.Dial(`mongodb://root:NG43ubjnbXjsxdWW3me699QyQCu7XW48@get-projects-bot-api.mohsen8.svc:27017/?authSource=admin&authMechanism=SCRAM-SHA-256&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false`)
 	} else {
 		session, err = mgo.Dial(mongoHost)
 	}
