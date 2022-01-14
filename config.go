@@ -7,7 +7,7 @@ import (
 
 var mongoHost = func() string {
 	if GetProccessMode() == "development" {
-		return "localhost"
+		return "mongodb://localhost:27017"
 	} else {
 		return getEnv("MONGODB_HOST")
 	}
