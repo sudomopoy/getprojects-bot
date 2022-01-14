@@ -8,6 +8,7 @@ type SingleProjectModel struct {
 	ID            string    `bson:"_id"`
 	UserId        string    `bson:"userId"`
 	Title         string    `bson:"title"`
+	Budget        string    `bson:"budget"`
 	Description   string    `bson:"description"`
 	Status        string    `bson:"status"`
 	ChannelPostId int       `bson:"channelPostId"`

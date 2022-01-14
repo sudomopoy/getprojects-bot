@@ -20,6 +20,26 @@ var i_want_to_cancel_enter_project_Keyboard = tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButton(label_cancel_entring_project_proccess),
 	),
 )
+var budgets_Keyboard = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("10 تا 100 هزار تومان"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("100 تا 500 هزار تومان"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("500 هزار تومان تا یک و نیم میلیون تومان"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("یک و نیم تا 5 میلیون تومان"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("توافقی"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(label_cancel_entring_project_proccess),
+	),
+)
 var i_accept_bot_usage_roles_Keyboard = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton(label_accept_bot_usage_roles),

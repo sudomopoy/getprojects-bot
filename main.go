@@ -152,17 +152,15 @@ func main() {
 					switch case_key {
 					case "ENTER_PROJECT_STEP+1":
 						RedisClientSet(userId, "ENTER_PROJECT_STEP+2:"+update.Message.Text)
-						msg.ReplyMarkup = i_want_to_cancel_enter_project_Keyboard
-						msg.Text = label_please_enter_poster_description
+						msg.ReplyMarkup = budgets_Keyboard
+						msg.Text = description_enter_budget
 					case "ENTER_PROJECT_STEP+2":
-						fmt.Println(userBaseInfo)
-						fmt.Println(UpdateSingleUserInfo(userBaseInfo))
-
-						projectTitle := metaData
-						projectDescription := update.Message.Text
+						projectBudget := update.Message.Text
+						projectDescription := metaData
 						var projectBaseInfo SingleProjectModel = SingleProjectModel{
 							UserId:      userBaseInfo.ID,
-							Title:       projectTitle,
+							Title:       "projectTitle",
+							Budget:      projectBudget,
 							Description: projectDescription,
 						}
 						projectBaseInfo, hasErr := CreateNewProjectBase(projectBaseInfo)
@@ -214,7 +212,7 @@ func main() {
 					case label_accept_bot_usage_roles:
 						RedisClientSet(userId, "ENTER_PROJECT_STEP+1:0")
 						msg.ReplyMarkup = i_want_to_cancel_enter_project_Keyboard
-						msg.Text = label_please_enter_poster_title
+						msg.Text = label_please_enter_poster_description
 					case token + password:
 						userBaseInfo.Role = ADMIN_ROLE
 						hasErr := UpdateSingleUserInfo(userBaseInfo)
@@ -282,7 +280,7 @@ func main() {
 						UpdateSingleProjectInfo(projectBaseInfo)
 						msg.Text = label_project_accepted
 						chanelMessageText := func() string {
-							return fmt.Sprintf(description_project_poster, projectBaseInfo.Title, projectBaseInfo.Description)
+							return fmt.Sprintf(description_project_poster, projectBaseInfo.Description, projectBaseInfo.Budget)
 						}()
 						userTempInfo := SingleUserModel{
 							ID: projectBaseInfo.UserId,
@@ -298,14 +296,14 @@ func main() {
 						chanelMessage := tgbotapi.NewMessage(masterChannelId, chanelMessageText)
 						chanelMessage.ReplyMarkup = project_in_chanel
 						userMessageText := func() string {
-							return fmt.Sprintf(description_project_accepted, projectBaseInfo.Title)
+							return fmt.Sprintf(description_project_accepted, projectBaseInfo.Description)
 						}()
 						ownerUserId, _ := strconv.Atoi(projectBaseInfo.UserId)
 						bot.Send(chanelMessage)
 						bot.Send(tgbotapi.NewMessage(int64(ownerUserId), userMessageText))
 					} else {
 						msg.Text = func() string {
-							return fmt.Sprintf(label_project_status_connot_edit, projectBaseInfo.Title)
+							return fmt.Sprintf(label_project_status_connot_edit, projectBaseInfo.Description)
 						}()
 					}
 				case "denied_project":
@@ -320,7 +318,7 @@ func main() {
 					msg.Text = label_project_rejected
 					ownerUserId, _ := strconv.Atoi(projectBaseInfo.UserId)
 					userMessageText := func() string {
-						return fmt.Sprintf(description_project_rejected, projectBaseInfo.Title)
+						return fmt.Sprintf(description_project_rejected, projectBaseInfo.Description)
 					}()
 					bot.Send(tgbotapi.NewMessage(int64(ownerUserId), userMessageText))
 				default:
