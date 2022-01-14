@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/google/uuid"
@@ -52,4 +53,62 @@ func check(e error) bool {
 	} else {
 		return false
 	}
+}
+
+var titles []string = []string{
+	"ریاضی",
+	"فیزیک",
+	"شیمی",
+	"وبسایت",
+	"php",
+	"برنامه نویسی",
+	"معماري",
+	"اسمبلی",
+	"مقاومت",
+	"مقاومت مصالح",
+	"رفع اشکال",
+	"انجام دهنده",
+	"مبانی برنامه نویسی",
+	"طراحی صنعتی",
+	"اخلاق اسلامی",
+	"سی شارپ",
+	"پایتون",
+	"پی اچ پی",
+	"معماري كامپيوتر",
+	"انرژی الکتریکی",
+	"سیستم های انرژی",
+	"مصالح",
+	"آمار و احتمال",
+	"امار",
+	"هوش مصنوعی",
+	"یادگیری ماشین",
+	"کنترل پروژه",
+	"مدار الکتریکی",
+	"زبان",
+	"انگلیسی",
+	"فرانسوی",
+	"آلمانی",
+	"المانی",
+}
+
+func titleDetector(text string) string {
+	var counts []int
+	for i := 0; i < len(titles); i++ {
+		counts = append(counts, strings.Count(text, titles[i]))
+	}
+	var maxValue int = 0
+	var maxValueIndex int = 0
+	for i := 0; i < len(counts); i++ {
+		if counts[i] > maxValue {
+			maxValue = counts[i]
+			maxValueIndex = i
+		}
+	}
+	var result string
+	if maxValue == 0 {
+		result = "غیره"
+	} else {
+		result = titles[maxValueIndex]
+	}
+	return result
 }

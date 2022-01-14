@@ -12,15 +12,15 @@ func Connect() *mongo.Database {
 
 	var client *mongo.Client
 	var err error
-	if GetProccessMode() == "product" {
-		credential := options.Credential{
-			Username: mongoUsername,
-			Password: mongoPassword,
-		}
-		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost).SetAuth(credential))
-	} else {
-		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost))
-	}
+	// if GetProccessMode() == "product" {
+	// 	credential := options.Credential{
+	// 		Username: mongoUsername,
+	// 		Password: mongoPassword,
+	// 	}
+	// 	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost).SetAuth(credential))
+	// } else {
+	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost))
+	// }
 	fmt.Println(err)
 	check(err)
 	return client.Database(mongoDatabase)

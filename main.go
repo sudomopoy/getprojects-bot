@@ -159,7 +159,7 @@ func main() {
 						projectDescription := metaData
 						var projectBaseInfo SingleProjectModel = SingleProjectModel{
 							UserId:      userBaseInfo.ID,
-							Title:       "projectTitle",
+							Title:       titleDetector(projectDescription),
 							Budget:      projectBudget,
 							Description: projectDescription,
 						}
@@ -280,7 +280,7 @@ func main() {
 						UpdateSingleProjectInfo(projectBaseInfo)
 						msg.Text = label_project_accepted
 						chanelMessageText := func() string {
-							return fmt.Sprintf(description_project_poster, projectBaseInfo.Description, projectBaseInfo.Budget)
+							return fmt.Sprintf(description_project_poster, projectBaseInfo.Title, projectBaseInfo.Description, projectBaseInfo.Budget)
 						}()
 						userTempInfo := SingleUserModel{
 							ID: projectBaseInfo.UserId,

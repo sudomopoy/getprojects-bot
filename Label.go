@@ -13,7 +13,7 @@ var (
 	label_project_rejected                = "پروژه رد شد🚫"
 	label_message_to_owner                = "پیام به کارفرما"
 	label_project_status_connot_edit      = "وضعیت پروژه %v قبلا مشخص شده و قابل تغییر نیست."
-	label_message_enter_same_project      = "ثبت پروژه مشابه"
+	label_message_enter_same_project      = "برای درج آگهی کلیک کنید"
 	label_admin_added                     = "ادمین اضافه شد"
 	label_please_enter_poster_title       = `
 	👇 عنوان کلی آگهی خود را ارسال کنید
@@ -46,6 +46,8 @@ var (
 	description_command_not_found = "دستور پیدا نشد! \n لطفا یکی از گزینه های زیر را انتخاب کنید."
 	description_project_poster    = `
 🔹 %v
+
+%v
 
 💰 بودجه: %v
 @GetProjectsOfficial
