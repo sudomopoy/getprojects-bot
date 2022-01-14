@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -20,7 +21,7 @@ func Connect() *mongo.Database {
 	} else {
 		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoHost))
 	}
-
+	fmt.Println(err)
 	check(err)
 	return client.Database(mongoDatabase)
 }
