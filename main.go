@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Mohsenpoureiny/getprojects-bot/database"
 	"fmt"
 	"log"
 	"strconv"
@@ -12,6 +13,8 @@ import (
 )
 
 func main() {
+	database.HiDatabase()
+	return
 	if GetProccessMode() == "product" {
 		err := sentry.Init(sentry.ClientOptions{
 			Dsn: "https://63ddf52733e346ed9eed3f93267bffc6@sentry.hamravesh.com/228",

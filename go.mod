@@ -1,4 +1,4 @@
-module getprojects
+module github.com/Mohsenpoureiny/getprojects-bot
 
 go 1.16
 
