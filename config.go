@@ -7,7 +7,7 @@ import (
 
 var mongoHost = func() string {
 	if GetProccessMode() == "development" {
-		return "mongodb://localhost:27017"
+		return "mongodb://f59b9432-58fc-4234-ba37-e0796779788f.hsvc.ir:31041"
 	} else {
 		return getEnv("MONGODB_HOST")
 	}
@@ -19,16 +19,17 @@ var mongoUsername = func() string {
 		return getEnv("MONGODB_USERNAME")
 	}
 }()
-var mongoUrl = func() string {
-	if GetProccessMode() == "development" {
-		return "mongodb://root:NG43ubjnbXjsxdWW3me699QyQCu7XW48@eb11f1d5-3660-4ac0-ba99-02f01bb5238d.hsvc.ir:32326/?authSource=admin&authMechanism=SCRAM-SHA-256&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false"
-	} else {
-		return getEnv("MONGODB_URL")
-	}
-}()
+
+//var mongoUrl = func() string {
+//	if GetProccessMode() == "development" {
+//		return "mongodb://root:PMOm1wBC9qVZ1V8nxJegwqSilrCFX9Vq@d3793492-dc27-4597-a5cf-406114fd5141.hsvc.ir:31327/?authSource=admin&authMechanism=SCRAM-SHA-256&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false"
+//	} else {
+//		return getEnv("MONGODB_URL")
+//	}
+//}()
 var mongoPassword = func() string {
 	if GetProccessMode() == "development" {
-		return "---"
+		return "zHGn2QLxOnWTKMZamKGJO44EaMRPrv3q"
 	} else {
 		return getEnv("MONGODB_PASSWORD")
 	}
@@ -36,14 +37,14 @@ var mongoPassword = func() string {
 
 var redisHost = func() string {
 	if GetProccessMode() == "development" {
-		return "localhost:6379"
+		return "d3793492-dc27-4597-a5cf-406114fd5141.hsvc.ir:31327"
 	} else {
 		return getEnv("REDIS_CACHE_HOST")
 	}
 }()
 var redisPassword = func() string {
 	if GetProccessMode() == "development" {
-		return ""
+		return "PMOm1wBC9qVZ1V8nxJegwqSilrCFX9Vq"
 	} else {
 		return getEnv("REDIS_CACHE_PASSWORD")
 	}
@@ -60,7 +61,7 @@ var redisDB = func() int {
 
 var token string = func() string {
 	if GetProccessMode() == "development" {
-		return "5029896112:AAHxUTEWiTXR6k64hoN1HeBxI1J3cb1530A"
+		return "6262069445:AAE_50p1bTlzEhSV6ncNlSehw7imXERssPE"
 	} else {
 		return getEnv("BOT_TOKEN")
 	}
@@ -76,7 +77,7 @@ var password string = func() string {
 
 var masterChannelId int64 = func() int64 {
 	if GetProccessMode() == "development" {
-		return -1001396154237
+		return -1001983509200
 	} else {
 		chId, _ := strconv.Atoi(getEnv("CONNECTED_CHANNEL"))
 		return int64(chId)
@@ -94,7 +95,7 @@ var mongoDatabase = func() string {
 var lang string = "fa"
 
 func GetProccessMode() string {
-	return getEnv("BOT_MODE")
+	return "development"
 }
 
 func getEnv(env string) string {

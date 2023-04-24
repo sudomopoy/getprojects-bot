@@ -1,20 +1,19 @@
 package main
 
 import (
-	"github.com/Mohsenpoureiny/getprojects-bot/database"
 	"fmt"
+	"github.com/Mohsenpoureiny/getprojects-bot/database"
+	"github.com/getsentry/sentry-go"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/getsentry/sentry-go"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {
 	database.HiDatabase()
-	return
+	//return
 	if GetProccessMode() == "product" {
 		err := sentry.Init(sentry.ClientOptions{
 			Dsn: "https://63ddf52733e346ed9eed3f93267bffc6@sentry.hamravesh.com/228",
