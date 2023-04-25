@@ -7,7 +7,7 @@ import (
 
 var mongoHost = func() string {
 	if GetProccessMode() == "development" {
-		return "mongodb://f59b9432-58fc-4234-ba37-e0796779788f.hsvc.ir:31041"
+		return "mongodb://root:zHGn2QLxOnWTKMZamKGJO44EaMRPrv3q@f59b9432-58fc-4234-ba37-e0796779788f.hsvc.ir:31041/?authSource=admin&authMechanism=SCRAM-SHA-256&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false"
 	} else {
 		return getEnv("MONGODB_HOST")
 	}
