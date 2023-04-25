@@ -47,7 +47,7 @@ func check(e error) bool {
 		if GetProccessMode() == "product" {
 			sentry.CaptureException(e)
 		} else {
-			fmt.Printf("%s", e)
+			fmt.Printf("Error: %s", e)
 		}
 		return true
 	} else {

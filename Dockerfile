@@ -6,4 +6,4 @@ COPY . .
 
 RUN go get
 
-CMD go run getprojects
+CMD go run github.com/Mohsenpoureiny/getprojects-bot
