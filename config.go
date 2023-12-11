@@ -7,44 +7,23 @@ import (
 
 var mongoHost = func() string {
 	if GetProccessMode() == "development" {
-		return "mongodb://root:zHGn2QLxOnWTKMZamKGJO44EaMRPrv3q@f59b9432-58fc-4234-ba37-e0796779788f.hsvc.ir:31041/?authSource=admin&authMechanism=SCRAM-SHA-256&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false"
+		// return "mongodb://root:ddonM6Mxc9nNB1g9BFNWMuIV@k2.liara.cloud:30108"
+		return "mongodb+srv://mopoycode:ZSxHyiaCYw0o86Mi@cluster0.7sjm6u3.mongodb.net"
 	} else {
 		return getEnv("MONGODB_HOST")
-	}
-}()
-var mongoUsername = func() string {
-	if GetProccessMode() == "development" {
-		return "root"
-	} else {
-		return getEnv("MONGODB_USERNAME")
-	}
-}()
-
-//var mongoUrl = func() string {
-//	if GetProccessMode() == "development" {
-//		return "mongodb://root:PMOm1wBC9qVZ1V8nxJegwqSilrCFX9Vq@d3793492-dc27-4597-a5cf-406114fd5141.hsvc.ir:31327/?authSource=admin&authMechanism=SCRAM-SHA-256&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false"
-//	} else {
-//		return getEnv("MONGODB_URL")
-//	}
-//}()
-var mongoPassword = func() string {
-	if GetProccessMode() == "development" {
-		return "zHGn2QLxOnWTKMZamKGJO44EaMRPrv3q"
-	} else {
-		return getEnv("MONGODB_PASSWORD")
 	}
 }()
 
 var redisHost = func() string {
 	if GetProccessMode() == "development" {
-		return "d3793492-dc27-4597-a5cf-406114fd5141.hsvc.ir:31327"
+		return "k2.liara.cloud:32718"
 	} else {
 		return getEnv("REDIS_CACHE_HOST")
 	}
 }()
 var redisPassword = func() string {
 	if GetProccessMode() == "development" {
-		return "PMOm1wBC9qVZ1V8nxJegwqSilrCFX9Vq"
+		return "ozFbiD78UK0xYfJyAPkKah1z"
 	} else {
 		return getEnv("REDIS_CACHE_PASSWORD")
 	}
@@ -61,7 +40,7 @@ var redisDB = func() int {
 
 var token string = func() string {
 	if GetProccessMode() == "development" {
-		return "6262069445:AAE_50p1bTlzEhSV6ncNlSehw7imXERssPE"
+		return "6979268271:AAGijfV4uxYmHfAbzpTyTxdvr-eXCUoj3bI"
 	} else {
 		return getEnv("BOT_TOKEN")
 	}
@@ -69,7 +48,7 @@ var token string = func() string {
 
 var password string = func() string {
 	if GetProccessMode() == "development" {
-		return "LH6vkeV5yaW5pj2yewXYqZUenCaNhFSaKad3tRJ5abVSSpS39sXyRsb"
+		return "6vkeV5yaW5pad3tRJ5abVSSpSLH39j2yewXYqZUenCaNhFSaKsXyRsb"
 	} else {
 		return getEnv("ADMIN_PASSWORD")
 	}
@@ -77,7 +56,7 @@ var password string = func() string {
 
 var masterChannelId int64 = func() int64 {
 	if GetProccessMode() == "development" {
-		return -1001983509200
+		return -1002008996715
 	} else {
 		chId, _ := strconv.Atoi(getEnv("CONNECTED_CHANNEL"))
 		return int64(chId)
@@ -86,7 +65,7 @@ var masterChannelId int64 = func() int64 {
 
 var mongoDatabase = func() string {
 	if GetProccessMode() == "development" {
-		return "get-projects--bot"
+		return "getprojects"
 	} else {
 		return getEnv("MONGODB_DATABASE_NAME")
 	}
