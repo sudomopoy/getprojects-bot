@@ -40,7 +40,9 @@ var redisDB = func() int {
 
 var token string = func() string {
 	if GetProccessMode() == "development" {
-		return "6979268271:AAGijfV4uxYmHfAbzpTyTxdvr-eXCUoj3bI"
+		// return "6979268271:AAGijfV4uxYmHfAbzpTyTxdvr-eXCUoj3bI"
+		return "6561222261:AAHoJaUZSvAbj-9pPvF-Cr9SQA_an2ubEZg"
+
 	} else {
 		return getEnv("BOT_TOKEN")
 	}
@@ -56,7 +58,8 @@ var password string = func() string {
 
 var masterChannelId int64 = func() int64 {
 	if GetProccessMode() == "development" {
-		return -1002008996715
+		// return -1002008996715
+		return -1001763684409
 	} else {
 		chId, _ := strconv.Atoi(getEnv("CONNECTED_CHANNEL"))
 		return int64(chId)
