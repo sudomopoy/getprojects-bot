@@ -4,6 +4,6 @@ WORKDIR /home
 
 COPY . .
 
-RUN go get
+RUN go mod tidy
 
 CMD go run github.com/Mohsenpoureiny/getprojects-bot

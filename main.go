@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/Mohsenpoureiny/getprojects-bot/database"
 	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
@@ -12,7 +11,6 @@ import (
 )
 
 func main() {
-	database.HiDatabase()
 	//return
 	if GetProccessMode() == "product" {
 		err := sentry.Init(sentry.ClientOptions{
